@@ -1,17 +1,34 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Order from "@/models/Order";
+import Product from "@/models/Product";
+import User from "@/models/User";
 
-// ✅ Create new order
 export async function POST(req: Request) {
   try {
     await connectDB();
-    const data = await req.json();
+    const { userId, items, status } = await req.json();
 
-    const newOrder = await Order.create(data);
+    if (!items || items.length === 0) {
+      return NextResponse.json({ error: "No items in order" }, { status: 400 });
+    }
+
+    // ✅ Calculate totalAmount securely on backend
+    const totalAmount = items.reduce((sum: number, item: any) => {
+      return sum + item.price * item.quantity;
+    }, 0);
+
+    const newOrder = await Order.create({
+      userId,
+      items,
+      totalAmount,
+      status: status || "pending",
+    });
+
     return NextResponse.json(newOrder, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Order creation failed:", error);
+    return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
   }
 }
 
@@ -19,14 +36,23 @@ export async function POST(req: Request) {
 export async function GET() {
   try {
     await connectDB();
+
     const orders = await Order.find()
-      .populate("userId") // get user details
-      .populate("items.productId"); // get product details
+      .populate({
+        path: "userId"
+      })
+      .populate({
+        path: "items.productId"
+      })
+      .sort({ createdAt: -1 }); // newest first
+
     return NextResponse.json(orders, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("❌ Failed to fetch orders:", error);
+    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
   }
 }
+
 
 // ✅ Update order
 export async function PUT(req: Request) {

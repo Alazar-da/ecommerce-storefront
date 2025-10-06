@@ -1,26 +1,32 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, model,Document, models } from "mongoose";
 
-// Define TypeScript interface for User model
 export interface IUser extends Document {
+
+  id: string;
   name: string;
-  email: string;
-  password: string;
-  role: "customer" | "admin";
+  description?: string;
+  image?: string; // category image (optional)
   createdAt: Date;
 }
 
-// Create User Schema
-const UserSchema: Schema<IUser> = new Schema(
+// ✅ Define User schema
+const UserSchema = new Schema(
   {
-    name: {
+    username: {
       type: String,
-      required: [true, "Name is required"],
+      required: [true, "Username is required"],
+      trim: true,
     },
     email: {
       type: String,
       required: [true, "Email is required"],
-      unique: true, // prevent duplicate emails
-      lowercase: true, // automatically converts to lowercase
+      unique: true,
+      lowercase: true,
+      match: [/\S+@\S+\.\S+/, "Invalid email format"],
+    },
+    phone: {
+      type: String,
+      required: false,
     },
     password: {
       type: String,
@@ -29,15 +35,13 @@ const UserSchema: Schema<IUser> = new Schema(
     },
     role: {
       type: String,
-      enum: ["customer", "admin"], // restrict to specific values
+      enum: ["admin", "customer"],
       default: "customer",
     },
   },
-  { timestamps: true } // auto add createdAt & updatedAt
+  { timestamps: true }
 );
 
-// Prevent model overwrite on hot reload in Next.js
-const User: Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
-
+// ✅ Prevent model overwrite when hot reloading
+const User = models.User || model("User", UserSchema);
 export default User;

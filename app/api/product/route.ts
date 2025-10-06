@@ -11,20 +11,44 @@ export async function POST(req: Request) {
     const newProduct = await Product.create(data);
     return NextResponse.json(newProduct, { status: 201 });
   } catch (error: any) {
+    console.log("Error in POST /api/product:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
+
   }
 }
 
-// ✅ Get all products
-export async function GET() {
+// ✅ Get all products with optional filters
+export async function GET(req: Request) {
   try {
     await connectDB();
-    const products = await Product.find().populate("categoryId");
+
+    // Extract query params (categoryId & search)
+    const { searchParams } = new URL(req.url);
+    const categoryId = searchParams.get("categoryId");
+    const search = searchParams.get("search");
+
+    // Build query object
+    const query: any = {};
+     // ✅ Only filter by category if it's not "all" and not empty
+    if (categoryId && categoryId !== "all") {
+      query.categoryId = categoryId;
+    }
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } }, // case-insensitive
+        { description: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    // Fetch products
+    const products = await Product.find(query).populate("categoryId");
+
     return NextResponse.json(products, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
 
 // ✅ Update product
 export async function PUT(req: Request) {

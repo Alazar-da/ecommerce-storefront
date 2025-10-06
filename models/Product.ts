@@ -6,7 +6,7 @@ export interface IProduct extends Document {
   name: string;
   description: string;
   price: number; // stored in cents (Stripe-friendly)
-  currency: "usd" | "eur";
+  currency: "ETB" | "USD";
   categoryId: ICategory["_id"];
   imageUrl: string;
   stock: number;
@@ -21,8 +21,8 @@ const ProductSchema: Schema<IProduct> = new Schema(
     price: { type: Number, required: true }, // cents
     currency: {
       type: String,
-      enum: ["usd", "eur"],
-      default: "usd",
+      enum: ["ETB", "USD"],
+      default: "ETB",
     },
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,

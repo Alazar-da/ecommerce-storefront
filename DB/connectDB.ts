@@ -7,27 +7,24 @@ const options: connectedOptions = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 };
-console.log("prprprp",process.env.MONGOUSER)
+let isConnected = false;
+
 // connecting to database
 const connectDB = async () => {
- /*    const connectionUrl: string = `mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPASS}@cluster0.e1crf.mongodb.net/${process.env.MONGODB}?retryWrites=true&w=majority` as string;
-    mongoose.connect(connectionUrl )
-        .then(() => console.log(`Database connected successfully`))
-        .catch((err) => console.log("Getting Error from DB connection" + err.message))
-    mongoose.set('strictQuery', false); */
-
-    
+     if (isConnected) return;
     try {
-        await mongoose.connect(`mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPASS}@cluster0.gpom6d9.mongodb.net/${process.env.MONGODB}?retryWrites=true&w=majority`)
-        console.log("connected")
+        await mongoose.connect(`mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPASS}@cluster0.bta9ljk.mongodb.net/${process.env.MONGODB}?retryWrites=true&w=majority`)
+          isConnected = true;
+   console.log("✅ MongoDB Connected:", mongoose.connection.host);
       
         
     } catch (error) {
 
-        console.log(error)
-        
-    } 
-}; 
+           console.error("❌ MongoDB Connection Error:", error);
+    throw error;
+
+    }
+};
 
 
 
