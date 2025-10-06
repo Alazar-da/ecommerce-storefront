@@ -1,10 +1,11 @@
+import {Category} from "./Category";
 export interface Product {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   price: number; // store in cents for Stripe compatibility
-  currency: "usd" | "eur"; // can extend later
-  categoryId: string;
+  currency: "ETB" | "USD"; // can extend later
+  categoryId: Category;
   imageUrl: string;
   stock: number;
   createdAt: string;

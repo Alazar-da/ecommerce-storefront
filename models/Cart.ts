@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
-import { IUser } from "./User"; // reference user
+import {IUser } from "./User"; // reference user
 import { ICategory } from "./Category"; // example: product categories
 
 // Cart item interface

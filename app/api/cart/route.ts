@@ -2,6 +2,45 @@ import { NextResponse } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Cart from "@/models/Cart";
 
+export async function PUT(req: Request) {
+  try {
+    await connectDB();
+    const { cartId, productId, quantity } = await req.json();
+
+    const cart = await Cart.findById(cartId);
+    if (!cart) return NextResponse.json({ error: "Cart not found" }, { status: 404 });
+
+    const item = cart.items.find((i) => i.productId.toString() === productId);
+    if (!item) return NextResponse.json({ error: "Item not found" }, { status: 404 });
+
+    item.quantity = quantity;
+    cart.total = cart.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    await cart.save();
+
+    return NextResponse.json(cart, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    await connectDB();
+    const { cartId, productId } = await req.json();
+
+    const cart = await Cart.findById(cartId);
+    if (!cart) return NextResponse.json({ error: "Cart not found" }, { status: 404 });
+
+    cart.items = cart.items.filter((i) => i.productId.toString() !== productId);
+    cart.total = cart.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    await cart.save();
+
+    return NextResponse.json(cart, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
 // ✅ Create a new cart
 export async function POST(req: Request) {
   try {
@@ -10,46 +49,7 @@ export async function POST(req: Request) {
 
     const newCart = await Cart.create(data);
     return NextResponse.json(newCart, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
-
-// ✅ Get all carts
-export async function GET() {
-  try {
-    await connectDB();
-    const carts = await Cart.find().populate("user").populate("items.category");
-    return NextResponse.json(carts, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
-
-// ✅ Update cart
-export async function PUT(req: Request) {
-  try {
-    await connectDB();
-    const { id, ...updateData } = await req.json();
-
-    const updatedCart = await Cart.findByIdAndUpdate(id, updateData, {
-      new: true,
-    });
-    return NextResponse.json(updatedCart, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
-
-// ✅ Delete cart
-export async function DELETE(req: Request) {
-  try {
-    await connectDB();
-    const { id } = await req.json();
-
-    await Cart.findByIdAndDelete(id);
-    return NextResponse.json({ message: "Cart deleted" }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
