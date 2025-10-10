@@ -24,7 +24,7 @@ export const authOptions = {
             id: data.user.id,      // map _id to id
             email: data.user.email,
             role: data.user.role,  // include role
-            name: data.user.userName || data.user.email, // optional
+            name: data.user.username, // optional
           };
         }
 

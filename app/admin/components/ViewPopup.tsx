@@ -1,6 +1,7 @@
 import { FiX, FiShoppingCart, FiHeart, FiStar, FiTag, FiBox, FiDollarSign, FiCalendar } from 'react-icons/fi';
 import { Product } from '@/types/Product';
 import { shortDate } from '@/utils/date';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface ViewPopupProps {
   product: Product;
@@ -29,10 +30,10 @@ const ViewPopup = ({ product, isOpen, onClose, onAddToCart }: ViewPopupProps) =>
   };
 
   // Format price based on currency
-  const formatPrice = (price: number, currency: string) => {
+/*   const formatPrice = (price: number, currency: string) => {
     const symbol = currency === "USD" ? "$" : "ETB ";
     return `${symbol}${price.toFixed(2)}`;
-  };
+  }; */
 
   // Generate rating based on product ID for demo
 /*   const getProductRating = (productId: string) => {
@@ -54,7 +55,7 @@ const ViewPopup = ({ product, isOpen, onClose, onAddToCart }: ViewPopupProps) =>
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition-colors hover:cursor-pointer"
           aria-label="Close product view"
         >
           <FiX className="w-5 h-5" />
@@ -94,6 +95,10 @@ const ViewPopup = ({ product, isOpen, onClose, onAddToCart }: ViewPopupProps) =>
             <div className="space-y-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h2>
+                {
+                  product.featured && ( <span className="inline-block bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">Featured</span> )
+                }
+               
                 <div className="flex items-center mb-4">
                {/*    <div className="flex text-yellow-400">
                     {[...Array(5)].map((_, i) => (
@@ -112,7 +117,7 @@ const ViewPopup = ({ product, isOpen, onClose, onAddToCart }: ViewPopupProps) =>
 
                 <div className="mb-6">
                   <span className="text-3xl font-bold text-gray-900">
-                    {formatPrice(product.price, product.currency)}
+                    <i className='upperCase'>{product.currency}</i> {formatPrice(product.price)}
                   </span>
                   {product.currency === "ETB" && (
                     <span className="text-sm text-gray-500 ml-2">(Ethiopian Birr)</span>
@@ -194,7 +199,7 @@ const ViewPopup = ({ product, isOpen, onClose, onAddToCart }: ViewPopupProps) =>
               </div>
 
               {/* Action buttons */}
-              <div className="flex space-x-4 pt-4">
+              {/* <div className="flex space-x-4 pt-4">
                 <button
                   onClick={() => onAddToCart && onAddToCart(product)}
                   disabled={product.stock === 0}
@@ -209,7 +214,7 @@ const ViewPopup = ({ product, isOpen, onClose, onAddToCart }: ViewPopupProps) =>
                 >
                   <FiHeart className="w-5 h-5" />
                 </button>
-              </div>
+              </div> */}
 
               {/* Stock warning */}
               {product.stock > 0 && product.stock < 10 && (

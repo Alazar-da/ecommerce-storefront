@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Cart from "@/models/Cart";
 
-// ✅ GET Cart by userId
 export async function GET(
   req: Request,
   { params }: { params: { id: string } }
@@ -11,7 +10,12 @@ export async function GET(
     await connectDB();
     const { id } = params;
 
-    const cart = await Cart.findOne({ user: id });
+    const cart = await Cart.findOne({ user: id })
+      .populate({
+        path: "items.productId",
+        select: "name price imageUrl stock rating averageRating", // fields you want
+      });
+
     if (!cart) {
       return NextResponse.json({ error: "Cart not found" }, { status: 404 });
     }
@@ -21,6 +25,7 @@ export async function GET(
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
 
 // ✅ Update Cart by userId
 export async function PUT(

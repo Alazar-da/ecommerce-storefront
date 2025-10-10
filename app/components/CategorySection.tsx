@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Category } from '@/types/Category';
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
@@ -11,8 +11,8 @@ function CategorySection() {
   const route = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-    const { data: session, status } = useSession();
-      const user = session?.user;
+  const { data: session } = useSession();
+  const user = session?.user;
 
 
   useEffect(() => {
@@ -47,7 +47,7 @@ function CategorySection() {
   }
   if (loading) {
     return (
-      <section className="py-12 bg-gray-50">
+      <section id='Categories' className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Shop by Category</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -66,7 +66,7 @@ function CategorySection() {
 
   if (error) {
     return (
-      <section className="py-12 bg-gray-50">
+      <section id='Categories' className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Shop by Category</h2>
           <div className="text-center text-red-600">
@@ -84,16 +84,16 @@ function CategorySection() {
   }
 
   return (
-    <section className="py-12 bg-gray-50">
+    <section id='Categories' className="py-12 bg-gray-100">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">Shop by Category</h2>
+        <h2 className="text-3xl text-emerald-600 font-bold text-center mb-12">Shop by Category</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {categories.map((category:Category) => (
             <a 
               key={category._id} 
               onClick={()=>handleCategory(category)}
              /*  href={`/products?category=${category.name}`} */
-              className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-300 hover:scale-105 transform hover:cursor-pointer"
+              className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-500 hover:scale-105 transform hover:cursor-pointer"
             >
               <div className="bg-gray-200 rounded-full h-24 w-24 mx-auto mb-4 overflow-hidden">
                 <img 

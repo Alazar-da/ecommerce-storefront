@@ -8,6 +8,7 @@ import { CartItem } from '@/types/CartItem';
 import { useSession, signOut } from "next-auth/react";
 import { toast } from 'react-toastify';
 import Link from 'next/link';
+import ProductCard from '../components/ProductCard';
 
 function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -98,49 +99,8 @@ const fetchProducts = async (id: string) => {
     setFilteredProducts(filtered);
   };
 
-const handleAddToCart = async (product: Product) => {
-  if (!session?.user) {
-    toast.info('Please log in to add items to cart');
-    return;
-  }
-
-  try {
-    const response = await fetch('/api/cart/add', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId: user?.id,
-        product: {
-          _id: product._id,
-          name: product.name,
-          price: product.price,
-          categoryId: (product.categoryId as any)._id || product.categoryId,
-        },
-        quantity: 1
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to add to cart');
-    }
-
-    const updatedCart = await response.json();
-    setCart(updatedCart);
-    toast.success(`${product.name} added to cart!`);
-  } catch (error: any) {
-    console.error('Error adding to cart:', error);
-    toast.error('Failed to add item to cart');
-  }
-};
 
 
-  const formatPrice = (price: number, currency: string) => {
-    if (currency === 'ETB') {
-      return `ETB ${price.toLocaleString()}`;
-    }
-    return `$${price.toLocaleString()}`;
-  };
 
   // Get category name from first product (since all products belong to same category)
   const categoryName = products.length > 0 && products[0].categoryId 
@@ -177,7 +137,7 @@ const handleAddToCart = async (product: Product) => {
             <p className="text-red-600 mb-4">{error}</p>
             <button
               onClick={() => categoryId && fetchProducts(categoryId)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
             >
               Try Again
             </button>
@@ -188,7 +148,7 @@ const handleAddToCart = async (product: Product) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <section className="min-h-screen bg-gray-50 py-8 text-slate-800">
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="flex mb-6" aria-label="Breadcrumb">
@@ -233,11 +193,11 @@ const handleAddToCart = async (product: Product) => {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="border border-gray-300 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+                className="border border-gray-300 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 w-48"
               />
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors text-sm"
+                className="bg-emerald-600 text-white px-4 py-2 rounded-r-md hover:bg-emerald-700 transition-colors text-sm"
               >
                 Search
               </button>
@@ -252,7 +212,7 @@ const handleAddToCart = async (product: Product) => {
                 id="sort"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
                 <option value="name">Name</option>
                 <option value="price-low">Price: Low to High</option>
@@ -288,7 +248,7 @@ const handleAddToCart = async (product: Product) => {
             )}
             <Link
               href="/"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
             >
               Back to Categories
             </Link>
@@ -296,62 +256,15 @@ const handleAddToCart = async (product: Product) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (
-              <div
+              <ProductCard
                 key={product._id}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="relative h-48 bg-gray-200 overflow-hidden">
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.currentTarget.src = '/images/placeholder-product.jpg';
-                    }}
-                  />
-                </div>
-                
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-2 text-gray-800 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {product.description}
-                  </p>
-                  
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-2xl font-bold text-gray-900">
-                      {formatPrice(product.price, product.currency)}
-                    </span>
-                    {product.stock > 0 ? (
-                      <span className="text-sm text-green-600 bg-green-50 px-2 py-1 rounded">
-                        {product.stock > 10 ? 'In Stock' : `Only ${product.stock} left`}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-red-600 bg-red-50 px-2 py-1 rounded">
-                        Out of Stock
-                      </span>
-                    )}
-                  </div>
-                  
-                  <button
-                    onClick={() => handleAddToCart(product)}
-                    disabled={product.stock === 0}
-                    className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${
-                      product.stock === 0
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
-                  >
-                    {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                  </button>
-                </div>
-              </div>
+                product={product}
+              />
             ))}
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }
 

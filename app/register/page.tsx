@@ -135,18 +135,12 @@ const handleSubmit = async (e: React.FormEvent) => {
          <ToastContainer />
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-md">
         <div>
-          <Link href="/login" className="inline-flex items-center text-blue-600 hover:text-blue-500 mb-4">
+          <Link href="/login" className="inline-flex items-center text-emerald-600 hover:text-emerald-500 mb-4">
             <FiArrowLeft className="mr-2" /> Back to login
           </Link>
           <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              sign in to your existing account
-            </Link>
-          </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
@@ -165,7 +159,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   autoComplete="username"
                   value={formData.username}
                   onChange={handleChange}
-                  className={`appearance-none block w-full pl-10 pr-3 py-2 border ${errors.username ? 'border-red-300' : 'border-gray-300'} rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  className={`appearance-none block w-full pl-10 pr-3 py-2 border ${errors.username ? 'border-red-300' : 'border-gray-300'} rounded-md placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
                   placeholder="Enter your username"
                 />
               </div>
@@ -187,7 +181,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`appearance-none block w-full pl-10 pr-3 py-2 border ${errors.email ? 'border-red-300' : 'border-gray-300'} rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  className={`appearance-none block w-full pl-10 pr-3 py-2 border ${errors.email ? 'border-red-300' : 'border-gray-300'} rounded-md placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
                   placeholder="Enter your email"
                 />
               </div>
@@ -209,7 +203,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   autoComplete="tel"
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`appearance-none block w-full pl-10 pr-3 py-2 border ${errors.phone ? 'border-red-300' : 'border-gray-300'} rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  className={`appearance-none block w-full pl-10 pr-3 py-2 border ${errors.phone ? 'border-red-300' : 'border-gray-300'} rounded-md placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
                   placeholder="Enter your phone number"
                 />
               </div>
@@ -231,7 +225,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   autoComplete="new-password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`appearance-none block w-full pl-10 pr-10 py-2 border ${errors.password ? 'border-red-300' : 'border-gray-300'} rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  className={`appearance-none block w-full pl-10 pr-10 py-2 border ${errors.password ? 'border-red-300' : 'border-gray-300'} rounded-md placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
                   placeholder="Create a password"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -262,7 +256,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   autoComplete="new-password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`appearance-none block w-full pl-10 pr-10 py-2 border ${errors.confirmPassword ? 'border-red-300' : 'border-gray-300'} rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  className={`appearance-none block w-full pl-10 pr-10 py-2 border ${errors.confirmPassword ? 'border-red-300' : 'border-gray-300'} rounded-md placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
                   placeholder="Confirm your password"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -284,22 +278,28 @@ const handleSubmit = async (e: React.FormEvent) => {
               id="terms"
               name="terms"
               type="checkbox"
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
               required
             />
             <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-              I agree to the <a href="#" className="text-blue-600 hover:text-blue-500">Terms and Conditions</a>
+              I agree to the <a href="#" className="text-emerald-600 hover:text-emerald-500">Terms and Conditions</a>
             </label>
           </div>
 
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 hover:cursor-pointer"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 hover:cursor-pointer"
             >
               Create Account
             </button>
+            <div className="mt-4 text-center flex justify-end">
+              <Link href="/login" className="text-sm text-slate-600 hover:text-cyan-700">
+                Already have an account? Sign in
+              </Link>
+            </div>  
           </div>
+
         </form>
       </div>
     </main>
