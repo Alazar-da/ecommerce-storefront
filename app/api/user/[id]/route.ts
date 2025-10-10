@@ -3,14 +3,14 @@ import connectDB from "@/DB/connectDB";
 import User from "@/models/User";
 
 // ✅ Get user by ID
-export async function GET(
-  req: Request,
-  { params }: { params: { email: string } }
-) {
+export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
     await connectDB();
-    const user = await User.findOne({ email: params.email });
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    const user = await User.findById(params.id).select('-password'); // exclude password
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     return NextResponse.json(user, { status: 200 });
   } catch (error: any) {

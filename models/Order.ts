@@ -30,8 +30,12 @@ const OrderSchema: Schema<IOrder> = new Schema(
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     items: [
       {
-        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
-        name: { type: String, required: true },
+        productId: {  // 👈 changed from productId to product
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+    },
+      name: { type: String, required: true },
         price: { type: Number, required: true }, // cents
         quantity: { type: Number, required: true, min: 1 },
         imageUrl: { type: String },

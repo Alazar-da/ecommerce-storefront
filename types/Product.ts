@@ -8,6 +8,9 @@ export interface Product {
   categoryId: Category;
   imageUrl: string;
   stock: number;
+  rating: number[]; // average rating
+  averageRating?: number; // Virtual field
+  featured: boolean;
   createdAt: string;
   updatedAt: string;
 }

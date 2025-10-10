@@ -25,6 +25,7 @@ export async function POST(req: Request) {
         id: user._id,
         email: user.email,
         role: user.role,
+        username: user.username,
       },
     }, { status: 200 });
   } catch (error: any) {

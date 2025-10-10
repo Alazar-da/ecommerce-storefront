@@ -9,7 +9,6 @@ export async function GET(
 ) {
   try {
     await connectDB();
-    
     const { id } = params;
     
     // Validate ID

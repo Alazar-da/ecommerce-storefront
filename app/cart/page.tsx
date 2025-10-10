@@ -5,6 +5,9 @@ import { Cart } from "@/types/Cart";
 import { Order } from "@/types/Order";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { formatPrice } from "@/utils/formatPrice";
+import { fetchProductById } from "@/utils/fetchProductById";
+import { Product } from "@/types/Product";
 
 export default function CartPage() {
   const [cart, setCart] = useState<Cart | null>(null);
@@ -12,6 +15,7 @@ export default function CartPage() {
   const [orderLoading, setOrderLoading] = useState(false);
   const { data: session, status } = useSession();
   const user = session?.user;
+  
 
   useEffect(() => {
     if (user) {
@@ -43,12 +47,14 @@ export default function CartPage() {
     }
   };
 
+  console.log("Current cart state:", cart);
+
 const updateCartItemQuantity = async (productId: string, newQuantity: number) => {
   if (!cart || newQuantity < 0) return;
   try {
     const updatedItems = cart.items
       .map((item) =>
-        item.productId === productId ? { ...item, quantity: newQuantity } : item
+        item.productId._id === productId ? { ...item, quantity: newQuantity } : item
       )
       .filter((item) => item.quantity > 0);
 
@@ -75,7 +81,7 @@ const updateCartItemQuantity = async (productId: string, newQuantity: number) =>
 const removeCartItem = async (productId: string) => {
   if (!cart) return;
   try {
-    const updatedItems = cart.items.filter((i) => i.productId !== productId);
+    const updatedItems = cart.items.filter((i) => i.productId._id !== productId);
     const totalQuantity = updatedItems.reduce((t, i) => t + i.quantity, 0);
     const totalPrice = updatedItems.reduce((t, i) => t + i.price * i.quantity, 0);
 
@@ -129,8 +135,12 @@ const clearCart = async () => {
     if (!cart || !user || cart.items.length === 0) return;
     try {
       setOrderLoading(true);
-      const orderData = { userId: user.id, items: cart.items, totalAmount: cart.total, status: "pending" };
-      const response = await fetch("/api/order", {
+      const orderData = { 
+  userId: user.id, 
+  items: cart.items,
+  status: "pending" 
+};
+   const response = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
@@ -155,8 +165,6 @@ const clearCart = async () => {
     }
   };
 
-  const formatPrice = (price: number) => `$${price.toFixed(2)}`;
-
   // 🔹 Loading state
   if (loading) {
     return (
@@ -174,7 +182,7 @@ const clearCart = async () => {
         <p className="text-gray-600 mb-6">You need to be logged in to view your cart.</p>
         <Link
           href="/login"
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
         >
           Log In
         </Link>
@@ -191,7 +199,7 @@ const clearCart = async () => {
         <p className="text-gray-600 mb-6">Add some products to your cart to get started.</p>
         <Link
           href="/"
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
         >
           Continue Shopping
         </Link>
@@ -201,13 +209,28 @@ const clearCart = async () => {
 
   // 🔹 Cart page
   return (
-    <div className="min-h-screen bg-gray-50 text-slate-800 py-10 px-4">
-      <div className="max-w-7xl mx-auto">
+<section className="min-h-screen bg-gray-50 py-8 text-slate-800">
+      <div className="container mx-auto px-4 max-w-7xl">
+         <nav className="flex mb-6" aria-label="Breadcrumb">
+          <ol className="flex items-center space-x-2 text-sm">
+            <li>
+              <Link href="/" className="text-gray-500 hover:text-gray-700">
+                Home
+              </Link>
+            </li>
+            <li className="flex items-center">
+              <span className="text-gray-400 mx-2">/</span>
+              <Link href="/" className="text-gray-500 hover:text-gray-700">
+                Cart
+              </Link>
+            </li>
+          </ol>
+        </nav>
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
           <button
             onClick={clearCart}
-            className="px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition"
+            className="px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-100 transition hover:cursor-pointer"
           >
             Clear Cart
           </button>
@@ -219,12 +242,12 @@ const clearCart = async () => {
             <div className="bg-white rounded-lg shadow">
               {cart.items.map((item) => (
                 <div
-                  key={item.productId}
+                  key={item.productId._id}
                   className="flex items-center p-6 border-b last:border-b-0"
                 >
                   {/* Product Image */}
                   <img
-                    src={item.imageUrl}
+                    src={item.productId.imageUrl}
                     alt={item.name}
                     className="w-20 h-20 object-cover rounded-lg border"
                     onError={(e) => (e.currentTarget.src = "/images/placeholder-product.jpg")}
@@ -233,22 +256,22 @@ const clearCart = async () => {
                   {/* Info */}
                   <div className="flex-1 ml-4">
                     <h3 className="font-semibold text-gray-800">{item.name}</h3>
-                    <p className="text-blue-600 font-bold">{formatPrice(item.price)}</p>
+                    <p className="text-emerald-600 font-bold">{formatPrice(item.price, item.productId.currency)}</p>
                   </div>
 
                   {/* Quantity */}
                   <div className="flex items-center space-x-2">
                     <button
-                      onClick={() => updateCartItemQuantity(item.productId, item.quantity - 1)}
-                      className="w-8 h-8 flex items-center justify-center border rounded hover:bg-gray-100 disabled:opacity-50"
+                      onClick={() => updateCartItemQuantity(item.productId._id, item.quantity - 1)}
+                      className="w-8 h-8 flex items-center justify-center border rounded hover:bg-gray-100 disabled:opacity-50 hover:cursor-pointer"
                       disabled={item.quantity <= 1}
                     >
                       -
                     </button>
                     <span className="w-8 text-center">{item.quantity}</span>
                     <button
-                      onClick={() => updateCartItemQuantity(item.productId, item.quantity + 1)}
-                      className="w-8 h-8 flex items-center justify-center border rounded hover:bg-gray-100"
+                      onClick={() => updateCartItemQuantity(item.productId._id, item.quantity + 1)}
+                      className="w-8 h-8 flex items-center justify-center border rounded hover:bg-gray-100 hover:cursor-pointer"
                     >
                       +
                     </button>
@@ -257,11 +280,11 @@ const clearCart = async () => {
                   {/* Item total */}
                   <div className="ml-6 text-right">
                     <p className="text-lg font-bold text-gray-900">
-                      {formatPrice(item.price * item.quantity)}
+                      {formatPrice(item.price * item.quantity, item.productId.currency)}
                     </p>
                     <button
-                      onClick={() => removeCartItem(item.productId)}
-                      className="text-red-600 hover:text-red-700 text-sm mt-2"
+                      onClick={() => removeCartItem(item.productId._id)}
+                      className="text-red-600 hover:text-red-700 text-sm mt-2 hover:cursor-pointer"
                     >
                       Remove
                     </button>
@@ -279,7 +302,7 @@ const clearCart = async () => {
               <div className="space-y-3 mb-6 text-gray-600">
                 <div className="flex justify-between">
                   <span>Subtotal ({cart.totalQuantity} items)</span>
-                  <span>{formatPrice(cart.total)}</span>
+                  <span>{formatPrice(cart.total, cart.items[0].productId.currency)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
@@ -287,21 +310,21 @@ const clearCart = async () => {
                 </div>
                 <div className="flex justify-between">
                   <span>Tax (15%)</span>
-                  <span>{formatPrice(cart.total * 0.15)}</span>
+                  <span>{formatPrice(cart.total * 0.15, cart.items[0].productId.currency)}</span>
                 </div>
               </div>
 
               <div className="border-t pt-4 mb-6 flex justify-between font-bold">
                 <span>Total</span>
-                <span className="text-blue-600">
-                  {formatPrice(cart.total * 1.15)}
+                <span className="text-emerald-600">
+                  {formatPrice(cart.total * 1.15, cart.items[0].productId.currency)}
                 </span>
               </div>
 
               <button
                 onClick={createOrder}
                 disabled={orderLoading}
-                className={`w-full py-3 rounded-lg font-semibold text-white ${
+                className={`w-full py-3 rounded-lg font-semibold text-white hover:cursor-pointer ${
                   orderLoading
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-green-600 hover:bg-green-700"
@@ -312,12 +335,12 @@ const clearCart = async () => {
 
               <Link
                 href="/"
-                className="block text-center text-blue-600 hover:text-blue-700 mt-4"
+                className="block text-center text-emerald-600 hover:text-emerald-700 mt-4"
               >
                 Continue Shopping
               </Link>
 
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-700">
+              <div className="mt-6 p-4 bg-cyan-50 rounded-lg text-sm text-cyan-700">
                 <p className="font-semibold mb-1">Secure Checkout</p>
                 <p>Your payment information is encrypted and secure.</p>
               </div>
@@ -325,6 +348,6 @@ const clearCart = async () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

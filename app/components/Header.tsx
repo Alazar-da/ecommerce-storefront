@@ -1,27 +1,35 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import { FiSearch, FiShoppingCart, FiUser, FiHeart, FiMenu, FiX, FiLogOut, FiLogIn, FiUserPlus } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart, FiUser, FiHeart, FiMenu, FiX, FiLogOut, FiLogIn, FiUserPlus, FiChevronDown } from 'react-icons/fi';
 import { useSession, signOut } from "next-auth/react";
 import Link from 'next/link';
 
-// Header Component
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState('login'); // 'login' or 'register'
+  const [authMode, setAuthMode] = useState('login');
   const { data: session, status } = useSession();
 
-
-  useEffect(() => {
-    console.log("Session data:", session);
-  }, [session]);
-
-  // Create a ref for the dropdown
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
+    const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      try {
+        const res = await fetch(`/api/cart/count/${session?.user.id}`);
+        const data = await res.json();
+        setCartCount(data.count);
+      } catch (error) {
+        console.error("Failed to fetch cart count:", error);
+      }
+    };
+
+    fetchCartCount();
+  }, [session]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -35,173 +43,240 @@ const Header = () => {
     };
   }, []);
 
-const handleUserActionClick = (/* e: React.MouseEvent */) => {
-  setUserDropdownOpen(prev => !prev); // Toggle dropdown
-/*   e.stopPropagation(); 
-  if (user) {
-    setUserDropdownOpen(prev => !prev); // ✅ works if logged in
-  } else {
-    setAuthModalOpen(true); // ❌ sets state, but no modal component exists
-    setAuthMode('login');
-    setUserDropdownOpen(false);
-  } */
-};
-
-
-  const switchAuthMode = () => {
-    setAuthMode(authMode === 'login' ? 'register' : 'login');
+  const handleUserActionClick = () => {
+    setUserDropdownOpen(prev => !prev);
   };
 
-  const handleLogout = () => {
-   signOut();
-    setUserDropdownOpen(false);
-  };
-
-  // Close mobile menu when a link is clicked
   const handleMobileLinkClick = () => {
     setMobileMenuOpen(false);
   };
 
   return (
     <>
-      <header className="bg-white shadow-md sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
+      {/* Top Announcement Bar */}
+      <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white py-2 text-sm text-center">
+        <p>🎉 Free shipping on orders over $50! Limited time offer.</p>
+      </div>
+
+      <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-100 ">
+        <div className=" mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-blue-600">ShopNow</Link>
+              <Link href="/" className="flex items-center space-x-2">
+                <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">SF</span>
+                </div>
+                <span className="text-2xl font-bold text-slate-900">
+                  Store Front
+                </span>
+              </Link>
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              <Link href="/" className="text-gray-800 hover:text-blue-600 font-medium">Home</Link>
-              <Link href="/products" className="text-gray-800 hover:text-blue-600 font-medium">Products</Link>
-              <Link href="#" className="text-gray-800 hover:text-blue-600 font-medium">Categories</Link>
-              <Link href="#" className="text-gray-800 hover:text-blue-600 font-medium">Deals</Link>
-              <Link href="#" className="text-gray-800 hover:text-blue-600 font-medium">About</Link>
+            <nav className="hidden lg:flex items-center space-x-1">
+              <Link 
+                href="#Home"
+                className="px-4 py-2 text-gray-700 hover:text-emerald-600 font-medium transition-all duration-200 hover:bg-emerald-50 rounded-lg"
+              >
+                Home
+              </Link>
+               <Link 
+                href="#About" 
+                className="px-4 py-2 text-gray-700 hover:text-emerald-600 font-medium transition-all duration-200 hover:bg-emerald-50 rounded-lg"
+              >
+                About
+              </Link>
+               <Link 
+                href="#Categories" 
+                className="px-4 py-2 text-gray-700 hover:text-emerald-600 font-medium transition-all duration-200 hover:bg-emerald-50 rounded-lg"
+              >
+                Categories
+              </Link>
+              <Link 
+                href="#Products" 
+                className="px-4 py-2 text-gray-700 hover:text-emerald-600 font-medium transition-all duration-200 hover:bg-emerald-50 rounded-lg"
+              >
+                Products
+              </Link>
+               
+             
+             {/*  <Link 
+                href="#" 
+                className="px-4 py-2 text-gray-700 hover:text-emerald-600 font-medium transition-all duration-200 hover:bg-emerald-50 rounded-lg"
+              >
+                Deals
+              </Link> */}
+             
             </nav>
 
-            {/* Search, Cart, and User Actions */}
-            <div className="flex items-center space-x-4">
-              <div className="hidden md:flex items-center bg-gray-100 rounded-lg px-3 py-2">
-                <FiSearch className="text-gray-500 mr-2" />
+            {/* Search Bar - Desktop */}
+            <div className="hidden md:flex flex-1 max-w-sm mx-8">
+              <div className="relative w-full">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search products..."
-                  className="bg-transparent outline-none w-40 lg:w-64"
+                  placeholder="Search for products, brands..."
+                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+            </div>
 
-              <button className="p-2 text-gray-700 hover:text-blue-600 relative">
+            {/* Action Buttons */}
+            <div className="flex items-center space-x-3">
+              {/* Wishlist */}
+          {/*     {session?.user ? (
+              <button className="p-3 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 relative group">
                 <FiHeart className="text-xl" />
-                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                  3
+                </span>
+                <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Wishlist
+                </span>
               </button>
+              ) : null} */}
 
-              <Link href={'/cart'} className="p-2 text-gray-700 hover:text-blue-600 relative">
+              {/* Cart */}
+              {session?.user ? (
+              <Link 
+                href="/cart" 
+                className="p-3 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 relative group"
+              >
                 <FiShoppingCart className="text-xl" />
-                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">2</span>
+                <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                  {cartCount}
+                </span>
+                <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Cart
+                </span>
               </Link>
+              ) : null}
 
-              <div className="relative" ref={dropdownRef}>
-  <button 
-    className="p-2 rounded-full transition-all duration-200 hover:bg-gray-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-    onClick={() => setUserDropdownOpen(prev => !prev)}
-  >
-    <div className="relative">
-      <i className="text-xl">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      </i>
-      {session?.user && (
-        <span className="absolute -top-1 -right-1 bg-blue-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
-          <span className="sr-only">User is logged in</span>
-        </span>
-      )}
-    </div>
-  </button>
-  
-  {/* User dropdown */}
-  {userDropdownOpen && (
-    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-100 animate-fade-in">
-      {session?.user ? (
-        <>
-          <div className="px-4 py-3 border-b border-gray-100">
-            <p className="text-sm font-medium text-gray-900">{session.user.name}</p>
-            <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
-          </div>
-          
-          <Link 
-            href="/profile" 
-            className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
-            onClick={handleMobileLinkClick}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            Profile
-          </Link>
-          
-          <Link 
-            href="/orders" 
-            className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
-            onClick={handleMobileLinkClick}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-            Orders
-          </Link>
-          
-          <div className="border-t border-gray-100 my-1"></div>
-          
-          <button 
-            onClick={() => {
-              signOut();
-              handleMobileLinkClick();
-            }}
-            className="flex items-center w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Logout
-          </button>
-        </>
-      ) : (
-        <>
-          <Link 
-            href="/login"
-            className="flex items-center px-4 py-3 text-sm text-blue-600 hover:bg-blue-50 transition-colors duration-150"
-            onClick={handleMobileLinkClick}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-            </svg>
-            Login
-          </Link>
-          
-          <Link 
-            href="/register"
-            className="flex items-center px-4 py-3 text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 mx-2 rounded-md transition-colors duration-150"
-            onClick={handleMobileLinkClick}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-            </svg>
-            Create Account
-          </Link>
-        </>
-      )}
-    </div>
-  )}
-</div>
+              {/* User Account */}
+              <div className="relative hidden lg:flex" ref={dropdownRef}>
+                <button 
+                  className="p-3 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 relative group hover:cursor-pointer"
+                  onClick={handleUserActionClick}
+                >
+                  <div className="relative">
+                    {session?.user ? (
+                      <div className="w-6 h-6 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        {session.user.name?.charAt(0).toUpperCase()}
+                      </div>
+                    ) : (
+                      <FiUser className="text-2xl" />
+                    )}
+                    {session?.user && (
+                      <span className="absolute -top-1 -right-1 bg-green-500 border-2 border-white rounded-full w-3 h-3"></span>
+                    )}
+                  </div>
+                  <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    Account
+                  </span>
+                </button>
+                
+                {/* User Dropdown */}
+                {userDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl py-3 z-50 border border-gray-100 animate-fade-in">
+                    {session?.user ? (
+                      <>
+                        <div className="px-4 py-3 border-b border-gray-100">
+                          <p className="text-sm font-semibold text-gray-900">{session.user.name}</p>
+                          <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
+                        </div>
+                        
+                        <Link 
+                          href="/profile" 
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 hover:cursor-pointer"
+                          onClick={handleMobileLinkClick}
+                        >
+                          <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                            <FiUser className="text-gray-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Profile</p>
+                            <p className="text-xs text-gray-500">Manage your account</p>
+                          </div>
+                        </Link>
+                        
+                        <Link 
+                          href="/orders" 
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200"
+                          onClick={handleMobileLinkClick}
+                        >
+                          <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                            <FiShoppingCart className="text-gray-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Orders</p>
+                            <p className="text-xs text-gray-500">View your orders</p>
+                          </div>
+                        </Link>
+                        
+                        <div className="border-t border-gray-100 my-2"></div>
+                        
+                        <button 
+                          onClick={() => {
+                            signOut();
+                            handleMobileLinkClick();
+                          }}
+                          className="flex items-center w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-all duration-200 rounded-lg mx-2"
+                        >
+                          <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                            <FiLogOut className="text-red-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Logout</p>
+                            <p className="text-xs text-red-500">Sign out of your account</p>
+                          </div>
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <div className="px-4 py-3 border-b border-gray-100">
+                          <p className="text-sm font-semibold text-gray-900">Welcome!</p>
+                          <p className="text-xs text-gray-500">Sign in to your account</p>
+                        </div>
+                        
+                        <Link 
+                          href="/login"
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200"
+                          onClick={handleMobileLinkClick}
+                        >
+                          <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                            <FiLogIn className="text-gray-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Login</p>
+                            <p className="text-xs text-gray-500">Access your account</p>
+                          </div>
+                        </Link>
+                        
+                        <Link 
+                          href="/register"
+                          className="flex items-center px-4 py-3 text-sm bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-emerald-700 hover:to-green-700 mx-2 rounded-xl transition-all duration-200 mt-2"
+                          onClick={handleMobileLinkClick}
+                        >
+                          <div className="w-8 h-8 bg-gray-100 bg-opacity-20 rounded-lg flex items-center justify-center mr-3">
+                            <FiUserPlus className='text-gray-600'/>
+                          </div>
+                          <div>
+                            <p className="font-medium">Create Account</p>
+                            <p className="text-xs text-white text-opacity-90">Join us today</p>
+                          </div>
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Mobile menu button */}
               <button 
-                className="md:hidden p-2 text-gray-700"
+                className="lg:hidden p-3 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle menu"
               >
@@ -212,12 +287,12 @@ const handleUserActionClick = (/* e: React.MouseEvent */) => {
 
           {/* Mobile Search */}
           <div className="mt-4 md:hidden">
-            <div className="flex items-center bg-gray-100 rounded-lg px-3 py-2">
-              <FiSearch className="text-gray-500 mr-2" />
+            <div className="relative">
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search products..."
-                className="bg-transparent outline-none w-full"
+                placeholder="Search for products..."
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -226,53 +301,119 @@ const handleUserActionClick = (/* e: React.MouseEvent */) => {
 
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
-            <nav className="md:hidden mt-4 pb-4 space-y-3">
-              <Link href="/" className="block text-gray-800 hover:text-blue-600 font-medium py-2" onClick={handleMobileLinkClick}>Home</Link>
-              <Link href="/products" className="block text-gray-800 hover:text-blue-600 font-medium py-2" onClick={handleMobileLinkClick}>Products</Link>
-              <Link href="#" className="block text-gray-800 hover:text-blue-600 font-medium py-2" onClick={handleMobileLinkClick}>Categories</Link>
-              <Link href="#" className="block text-gray-800 hover:text-blue-600 font-medium py-2" onClick={handleMobileLinkClick}>Deals</Link>
-              <Link href="#" className="block text-gray-800 hover:text-blue-600 font-medium py-2" onClick={handleMobileLinkClick}>About</Link>
-              
-              {/* Mobile user actions */}
-             {/*  {user ? (
-                <div className="pt-2 border-t">
-                  <p className="px-4 py-2 text-sm font-medium">{user.userName}</p>
-                  <Link href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={handleMobileLinkClick}>Profile</Link>
-                  <Link href="/orders" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={handleMobileLinkClick}>Orders</Link>
-                  <button 
-                    onClick={() => {
-                      logout();
-                      handleMobileLinkClick();
-                    }}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <div className="pt-2 border-t flex flex-col space-y-2">
-                  <Link 
-                    href="/login"
-                    className="flex items-center px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-md"
-                    onClick={handleMobileLinkClick}
-                  >
-                    <FiLogIn className="mr-2" /> Login
-                  </Link>
-                  <Link 
-                    href="/register"
-                    className="flex items-center px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
-                    onClick={handleMobileLinkClick}
-                  >
-                    <FiUserPlus className="mr-2" /> Register
-                  </Link>
-                </div>
-              )} */}
-            </nav>
-          )}
+            <div className="lg:hidden mt-6 pb-4 animate-slide-down">
+              <nav className="space-y-2">
+                <Link 
+                  href="/" 
+                  className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 font-medium"
+                  onClick={handleMobileLinkClick}
+                >
+                  Home
+                </Link>
+                 <Link 
+                  href="#" 
+                  className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 font-medium"
+                  onClick={handleMobileLinkClick}
+                >
+                  About
+                </Link>
+                <Link 
+                  href="/products" 
+                  className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 font-medium"
+                  onClick={handleMobileLinkClick}
+                >
+                  Products
+                </Link>
+                <Link 
+                  href="#" 
+                  className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 font-medium"
+                  onClick={handleMobileLinkClick}
+                >
+                  Categories
+                </Link>
+               {/*  <Link 
+                  href="#" 
+                  className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 font-medium"
+                  onClick={handleMobileLinkClick}
+                >
+                  Deals
+                </Link> */}
+               
+              </nav>
 
-          
+              {/* Mobile user section */}
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                {session?.user ? (
+                  <div className="space-y-2">
+                    <div className="px-4 py-2">
+                      <p className="text-sm font-semibold text-gray-900">{session.user.name}</p>
+                      <p className="text-xs text-gray-500">{session.user.email}</p>
+                    </div>
+                    <Link 
+                      href="/profile" 
+                      className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200"
+                      onClick={handleMobileLinkClick}
+                    >
+                      <FiUser className="mr-3" /> Profile
+                    </Link>
+                    <Link 
+                      href="/orders" 
+                      className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200"
+                      onClick={handleMobileLinkClick}
+                    >
+                      <FiShoppingCart className="mr-3" /> Orders
+                    </Link>
+                    <button 
+                      onClick={() => {
+                        signOut();
+                        handleMobileLinkClick();
+                      }}
+                      className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                    >
+                      <FiLogOut className="mr-3" /> Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Link 
+                      href="/login"
+                      className="flex items-center px-4 py-3 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 font-medium"
+                      onClick={handleMobileLinkClick}
+                    >
+                      <FiLogIn className="mr-3" /> Login
+                    </Link>
+                    <Link 
+                      href="/register"
+                      className="flex items-center px-4 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-green-700 hover:to-emerald-700 rounded-xl transition-all duration-200 font-medium justify-center"
+                      onClick={handleMobileLinkClick}
+                    >
+                      <FiUserPlus className="mr-3" /> Create Account
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </header>
+
+      {/* Add custom animations to your global CSS */}
+      <style jsx global>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slide-down {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.2s ease-out;
+        }
+        .animate-slide-down {
+          animation: slide-down 0.3s ease-out;
+        }
+      `}</style>
     </>
   );
 };

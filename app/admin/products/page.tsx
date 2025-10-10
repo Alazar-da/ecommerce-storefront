@@ -10,6 +10,7 @@ import { Category } from "@/types/Category";
 import { Order } from '@/types/Order';
 import {shortDate} from '@/utils/date';
 import { toast } from 'react-toastify';
+import { formatPrice } from '@/utils/formatPrice';
 
 const ProductPage = () => {
   const [loading, setLoading] = useState(false);
@@ -235,7 +236,8 @@ const ProductPage = () => {
             </button>
           </div>
           
-          <button  onClick={() => setIsOpen(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm hover:cursor-pointer">
+          <button  onClick={() => setIsOpen(true)} className="w-full py-2 px-4 rounded-md text-white bg-emerald-600 hover:bg-emerald-700 hover:cursor-pointer"
+         >
             Add New Product
           </button>
         </div>
@@ -249,7 +251,7 @@ const ProductPage = () => {
             <input
               type="text"
               placeholder="Search products..."
-              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -258,7 +260,7 @@ const ProductPage = () => {
           {/* Category filter */}
           <div className="md:ml-4">
             <select
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
             >
@@ -279,7 +281,7 @@ const ProductPage = () => {
         
         {loading ? (
   <div className="flex justify-center items-center py-10">
-    <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+    <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
     <span className="ml-3 text-gray-600">Loading products...</span>
   </div>
 ) : (
@@ -314,7 +316,7 @@ const ProductPage = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">{product.price.toFixed(2)} Birr</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">{formatPrice(product.price, product.currency)} Birr</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.categoryId.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -373,10 +375,18 @@ const ProductPage = () => {
                   <div className="p-4">
                     <div className="flex items-start">
                       <div className="ml-4 flex-1">
+                        <div className='flex justify-between'>
+                          <span>
                         <h3 className="text-sm font-medium">{product.name}</h3>
                         <p className="text-sm text-gray-500 mt-1 line-clamp-2">{product.description}</p>
+</span>
+                          {
+                  product.featured && ( <span className="inline-block bg-emerald-100 text-emerald-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded h-fit">Featured</span> )
+                }
+              
+                </div>
                         <div className="mt-2 flex items-center">
-                          <span className="text-sm font-medium">{product.price.toFixed(2)} Birr</span>
+                          <span className="text-sm font-medium">{formatPrice(product.price,product.currency)}</span>
                           <span className="mx-2 text-gray-300">•</span>
                           <span className="text-sm text-gray-500">{product.category}</span>
                         </div>
@@ -395,7 +405,7 @@ const ProductPage = () => {
                     <span className="text-xs text-gray-500">Added: {shortDate(product.createdAt)}</span>
                     <div className="flex space-x-2">
                       <button 
-                        className="text-blue-600 hover:text-blue-900 p-1 hover:cursor-pointer"
+                        className="text-emerald-600 hover:text-emerald-900 p-1 hover:cursor-pointer"
                         onClick={() => handleViewClick(product)}
                         aria-label="View product"
                       >
@@ -403,7 +413,7 @@ const ProductPage = () => {
                       </button>
                       <button 
                         className="text-green-600 hover:text-green-900 p-1 hover:cursor-pointer"
-                        onClick={() => handleEdit(product.id)}
+                        onClick={() => handleEdit(product)}
                         aria-label="Edit product"
                       >
                         <FiEdit className="text-lg" title={`Edit ${product.name}`} />

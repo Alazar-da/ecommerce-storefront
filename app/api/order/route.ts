@@ -39,11 +39,13 @@ export async function GET() {
 
     const orders = await Order.find()
       .populate({
-        path: "userId"
+        path: "userId",
+        model: User,
       })
-      .populate({
-        path: "items.productId"
-      })
+     .populate({
+  path: "items.productId",
+  model: Product,
+})
       .sort({ createdAt: -1 }); // newest first
 
     return NextResponse.json(orders, { status: 200 });

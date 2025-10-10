@@ -4,8 +4,10 @@ export interface IUser extends Document {
 
   id: string;
   name: string;
-  description?: string;
-  image?: string; // category image (optional)
+  email: string;
+  phone?: string;
+  password: string;
+  role: "admin" | "customer";
   createdAt: Date;
 }
 

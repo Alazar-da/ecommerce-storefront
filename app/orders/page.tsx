@@ -2,13 +2,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
-
-interface Order {
-  _id: string;
-  totalAmount: number; // in cents
-  status: string;
-  createdAt: string;
-}
+import { formatPrice } from "@/utils/formatPrice";
+import { Order } from "@/types/Order";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -30,11 +25,27 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  return (
-       <main className="min-h-screen bg-gray-50 text-slate-800 py-8 w-full">
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">My Orders</h1>
+  console.log(orders);
 
+  return (
+  <section className="min-h-screen bg-gray-50 py-8 text-slate-800">
+      <div className="container mx-auto px-4 max-w-5xl">
+         <nav className="flex mb-6" aria-label="Breadcrumb">
+          <ol className="flex items-center space-x-2 text-sm">
+            <li>
+              <Link href="/" className="text-gray-500 hover:text-gray-700">
+                Home
+              </Link>
+            </li>
+            <li className="flex items-center">
+              <span className="text-gray-400 mx-2">/</span>
+              <Link href="/" className="text-gray-500 hover:text-gray-700">
+                Orders
+              </Link>
+            </li>
+          </ol>
+        </nav>
+      <h1 className="text-3xl font-bold mb-8">My Orders</h1>
       {/* Loading State */}
       {loading && (
         <div className="space-y-4">
@@ -53,7 +64,7 @@ export default function OrdersPage() {
           <p className="text-gray-500">You haven’t placed any orders yet.</p>
           <Link
             href="/products"
-            className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            className="mt-4 inline-block bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition"
           >
             Start Shopping
           </Link>
@@ -66,7 +77,8 @@ export default function OrdersPage() {
           {orders.map((order) => (
             <div
               key={order._id}
-              className="p-5 border rounded-xl shadow-sm bg-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between hover:shadow-md transition"
+              onClick={() => (window.location.href = `/orders/${order._id}`)}
+              className="p-5 border rounded-xl shadow-sm bg-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between hover:shadow-md transition hover:bg-cyan-50 hover:cursor-pointer"
             >
               <div>
                 <p className="font-semibold text-gray-800">
@@ -86,7 +98,11 @@ export default function OrdersPage() {
                       ? "bg-yellow-100 text-yellow-800"
                       : order.status === "paid"
                       ? "bg-green-100 text-green-800"
-                      : order.status === "failed"
+                      : order.status === "shipped"
+                      ? "bg-emerald-100 text-emerald-800"
+                      : order.status === "completed"
+                      ? "bg-gray-200 text-gray-900"
+                      : order.status === "cancelled"
                       ? "bg-red-100 text-red-800"
                       : "bg-gray-100 text-gray-700"
                   }`}
@@ -97,11 +113,11 @@ export default function OrdersPage() {
 
               <div className="text-right mt-4 sm:mt-0">
                 <p className="font-bold text-lg text-gray-900">
-                  ${(order.totalAmount / 100).toFixed(2)}
+                 {formatPrice(order.totalAmount,order.items[0].productId?.currency)}
                 </p>
                 <Link
                   href={`/orders/${order._id}`}
-                  className="text-blue-600 hover:underline text-sm"
+                  className="text-emerald-600 hover:underline text-sm"
                 >
                   View Details →
                 </Link>
@@ -111,6 +127,6 @@ export default function OrdersPage() {
         </div>
       )}
     </div>
-    </main>
+    </section>
   );
 }

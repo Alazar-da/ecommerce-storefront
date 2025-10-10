@@ -28,6 +28,7 @@ export default function ProductFormModal({
     categoryId: "",
     imageUrl: "",
     stock: "",
+    featured: false, // ✅ New field added
   });
   const [resource, setResource] = useState<{ secure_url?: string } | undefined>(undefined);
   const [errors, setErrors] = useState<any>({});
@@ -43,11 +44,13 @@ export default function ProductFormModal({
           description: initialData.description || "",
           currency: initialData.currency || "ETB",
           price: initialData.price?.toString() || "",
-          categoryId: typeof initialData.categoryId === "object" && initialData.categoryId !== null
-            ? initialData.categoryId._id
-            : (initialData.categoryId || ""),
+          categoryId:
+            typeof initialData.categoryId === "object" && initialData.categoryId !== null
+              ? initialData.categoryId._id
+              : (initialData.categoryId || ""),
           imageUrl: initialData.imageUrl || "",
           stock: initialData.stock?.toString() || "",
+          featured: Boolean(initialData.featured), // ✅ Load featured value
         });
         setResource(initialData.imageUrl ? { secure_url: initialData.imageUrl } : undefined);
       } else {
@@ -60,6 +63,7 @@ export default function ProductFormModal({
           categoryId: "",
           imageUrl: "",
           stock: "",
+          featured: false,
         });
         setResource(undefined);
       }
@@ -70,7 +74,7 @@ export default function ProductFormModal({
   // ✅ Update imageUrl when resource changes
   useEffect(() => {
     if (resource?.secure_url) {
-      setFormData((prev:any) => ({ ...prev, imageUrl: resource.secure_url }));
+      setFormData((prev: any) => ({ ...prev, imageUrl: resource.secure_url }));
     }
   }, [resource]);
 
@@ -111,23 +115,23 @@ export default function ProductFormModal({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    validateField(name, value);
+    const { name, value, type } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox"
+        ? (e.target as HTMLInputElement).checked
+        : value,
+    }));
+    if (type !== "checkbox") validateField(name, value);
   };
 
-  // ✅ Handle Submit for both Create and Edit
+  // ✅ Handle Submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validate all required fields
     let hasError = false;
     const requiredFields = ["name", "price", "categoryId", "stock"];
-    
     requiredFields.forEach((field) => {
       validateField(field, formData[field as keyof typeof formData] as string);
       if (!formData[field as keyof typeof formData]) hasError = true;
@@ -140,25 +144,20 @@ export default function ProductFormModal({
 
     try {
       setLoading(true);
-
       const productData = {
         ...formData,
         price: Number(formData.price),
         stock: Number(formData.stock),
       };
 
-      console.log("Submitting product data:", productData);
-
       let res;
       if (initialData) {
-        // Edit mode - PUT request
         res = await fetch(`/api/product/${initialData._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(productData),
         });
       } else {
-        // Create mode - POST request
         res = await fetch("/api/product", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -168,17 +167,9 @@ export default function ProductFormModal({
 
       if (res.ok) {
         const savedProduct = await res.json();
-        toast.success(
-          initialData 
-            ? "Product updated successfully!" 
-            : "Product created successfully!"
-        );
+        toast.success(initialData ? "Product updated successfully!" : "Product created successfully!");
         onSave(savedProduct);
-
-        setTimeout(() => {
-          window.location.reload();
-        }, 4500);
-     
+        setTimeout(() => window.location.reload(), 4500);
       } else {
         const errorData = await res.json();
         toast.error(errorData.error || "Failed to save product");
@@ -188,11 +179,9 @@ export default function ProductFormModal({
       toast.error("An error occurred while saving the product");
     } finally {
       setLoading(false);
-  
     }
   };
 
-  // ✅ Handle close with reset
   const handleClose = () => {
     setFormData({
       name: "",
@@ -202,6 +191,7 @@ export default function ProductFormModal({
       categoryId: "",
       imageUrl: "",
       stock: "",
+      featured: false,
     });
     setResource(undefined);
     setErrors({});
@@ -209,6 +199,7 @@ export default function ProductFormModal({
   };
 
   if (!isOpen) return null;
+
 
   return (
     <section className="fixed inset-0 min-h-screen z-50 flex items-center justify-center bg-black/50">
@@ -219,7 +210,8 @@ export default function ProductFormModal({
           </h2>
           <button
             onClick={handleClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl hover:cursor-pointer"
+            className="text-gray-500 hover:text-red-300 text-2xl hover:cursor-pointer"
+          title="close"
           >
             &times;
           </button>
@@ -237,8 +229,8 @@ export default function ProductFormModal({
               placeholder="Enter product name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
-              required
+             className={`appearance-none block w-full px-3 py-2 border ${errors.name ? 'border-red-300' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
+                   required
             />
             {errors.name && (
               <p className="text-red-500 text-sm mt-1">{errors.name}</p>
@@ -256,7 +248,7 @@ export default function ProductFormModal({
               value={formData.description}
               onChange={handleChange}
               rows={3}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
+              className={`appearance-none block w-full px-3 py-2 border ${errors.description ? 'border-red-300' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
             />
           </div>
 
@@ -274,8 +266,8 @@ export default function ProductFormModal({
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
-                required
+               className={`appearance-none block w-full px-3 py-2 border ${errors.price ? 'border-red-300' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
+               required
               />
               {errors.price && (
                 <p className="text-red-500 text-sm mt-1">{errors.price}</p>
@@ -289,8 +281,9 @@ export default function ProductFormModal({
                 name="currency"
                 value={formData.currency}
                 onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
-              >
+                className={`block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
+                
+                >
                 <option value="ETB">ETB</option>
                 <option value="USD">USD</option>
               </select>
@@ -306,7 +299,7 @@ export default function ProductFormModal({
               name="categoryId"
               value={formData.categoryId}
               onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
+              className={` block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
               required
             >
               <option value="">Select category</option>
@@ -320,6 +313,22 @@ export default function ProductFormModal({
               <p className="text-red-500 text-sm mt-1">{errors.categoryId}</p>
             )}
           </div>
+
+                    {/* ✅ Featured Checkbox */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="featured"
+              checked={formData.featured}
+              onChange={handleChange}
+              id="featured"
+              className={`block focus:outline-none text-emerald-500 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
+            />
+            <label htmlFor="featured" className="text-sm text-gray-700">
+              Mark as Featured Product
+            </label>
+          </div>
+
 
           {/* Image Upload */}
           <div>
@@ -348,7 +357,7 @@ export default function ProductFormModal({
                   <button 
                     onClick={handleOnClick} 
                     type="button" 
-                    className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                    className="px-2 py-1 rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 transition-colors hover:cursor-pointer"
                   >
                     {formData.imageUrl ? "Change Image" : "Upload Image"}
                   </button>
@@ -386,8 +395,8 @@ export default function ProductFormModal({
               value={formData.stock}
               onChange={handleChange}
               min="0"
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
-              required
+              className={`appearance-none block w-full px-3 py-2 border ${errors.stock ? 'border-red-300' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm`}
+               required
             />
             {errors.stock && (
               <p className="text-red-500 text-sm mt-1">{errors.stock}</p>
@@ -407,8 +416,8 @@ export default function ProductFormModal({
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 disabled:bg-cyan-400 transition-colors hover:cursor-pointer"
-            >
+              className={`py-2 px-4 rounded-md text-white bg-emerald-600 ${loading ? 'opacity-50' : ''} hover:bg-emerald-700 hover:cursor-pointer`}
+          >
               {loading ? "Saving..." : initialData ? "Update Product" : "Create Product"}
             </button>
           </div>

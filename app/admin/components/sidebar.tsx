@@ -54,7 +54,7 @@ const Sidebar = ({ activePage, setActivePage }: {
             <Link
               key={item.id}
                   href={"/admin"+item.path}
-              className={`flex items-center w-full px-4 py-3 text-left transition-colors duration-200 hover:cursor-pointer ${activePage === item.id ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}
+              className={`flex items-center w-full px-4 py-3 text-left transition-colors duration-200 hover:cursor-pointer ${activePage === item.id ? 'bg-emerald-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}
               onClick={() => setActivePage(item.id)}
             >
               <span className="mr-3">{item.icon}</span>
@@ -65,10 +65,21 @@ const Sidebar = ({ activePage, setActivePage }: {
         </nav>
         
         <div className="absolute bottom-0 w-full p-4 border-t border-gray-800">
-          <Link href={'/'} onClick={() => signOut()} className="flex items-center w-full px-4 py-2 text-left text-gray-300 hover:text-red-300 hover:cursor-pointer">
+          <div className='text-sm'>
+            <div className="flex items-center">
+              <FiUser className="text-gray-300 mr-2 text-lg" />
+              <span className="text-gray-300 font-medium">{session?.user?.name || 'Admin User'}</span>
+            </div>
+          </div>
+          <button onClick={() => {
+                        signOut({
+  callbackUrl: "/",         // 👈 redirect URL after sign out
+});
+                        
+                      }} className="flex items-center w-full px-4 py-2 text-left text-gray-300 hover:text-red-300 hover:cursor-pointer">
             <FiLogOut className="mr-3 text-lg" />
             <span>Logout</span>
-          </Link>
+          </button>
         </div>
       </section>
     </>
