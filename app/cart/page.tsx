@@ -1,13 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Cart } from "@/types/Cart";
 import { Order } from "@/types/Order";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { formatPrice } from "@/utils/formatPrice";
-import { fetchProductById } from "@/utils/fetchProductById";
-import { Product } from "@/types/Product";
+
 
 export default function CartPage() {
   const [cart, setCart] = useState<Cart | null>(null);

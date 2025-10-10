@@ -1,4 +1,4 @@
-import { FiX, FiShoppingCart, FiHeart, FiStar, FiTag, FiBox, FiDollarSign, FiCalendar } from 'react-icons/fi';
+import { FiX, FiTag, FiBox, FiDollarSign, FiCalendar } from 'react-icons/fi';
 import { Product } from '@/types/Product';
 import { shortDate } from '@/utils/date';
 import { formatPrice } from '@/utils/formatPrice';
@@ -117,7 +117,7 @@ const ViewPopup = ({ product, isOpen, onClose, onAddToCart }: ViewPopupProps) =>
 
                 <div className="mb-6">
                   <span className="text-3xl font-bold text-gray-900">
-                    <i className='upperCase'>{product.currency}</i> {formatPrice(product.price)}
+                    <i className='upperCase'>{product.currency}</i> {formatPrice(product.price, product.currency)}
                   </span>
                   {product.currency === "ETB" && (
                     <span className="text-sm text-gray-500 ml-2">(Ethiopian Birr)</span>

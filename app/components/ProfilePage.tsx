@@ -3,15 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { toast } from 'react-toastify';
-
-interface User {
-  _id: string;
-  username: string;
-  email: string;
-  phone?: string;
-  role: 'admin' | 'customer';
-  createdAt: string;
-}
+import { User } from '@/types/User';
 
 interface PasswordForm {
     userId: string;

@@ -2,8 +2,7 @@
 import { useEffect, useState } from "react";
 import { Product } from "@/types/Product";
 import Link from "next/link";
-import { FiStar, FiShoppingCart, FiHeart, FiEye } from "react-icons/fi";
-import { formatPrice } from "@/utils/formatPrice";
+import { FiStar } from "react-icons/fi";
 import ProductCard from "./ProductCard";
 
 export default function FeaturedProducts() {

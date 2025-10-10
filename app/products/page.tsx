@@ -3,9 +3,6 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Product } from '@/types/Product';
 import { Category } from '@/types/Category';
-import { Cart } from '@/types/Cart';
-import { CartItem } from '@/types/CartItem';
-import { useSession, signOut } from "next-auth/react";
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import ProductCard from '../components/ProductCard';
@@ -17,9 +14,6 @@ function ProductsPage() {
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('name');
   const [searchQuery, setSearchQuery] = useState<string>('');
-    const [cart, setCart] = useState<Cart | null>(null);
-     const { data: session, status } = useSession();
-       const user = session?.user;
 
 
   

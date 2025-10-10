@@ -1,15 +1,8 @@
 'use client'
 import { useState } from 'react';
-import { FiHome, FiBox, FiShoppingCart, FiUsers, FiSettings, FiPieChart, FiLogOut, FiMenu, FiX, FiEdit, FiTrash2, FiPlus, FiSearch, FiUser } from 'react-icons/fi';
+import { FiBox, FiShoppingCart, FiUsers, FiPieChart } from 'react-icons/fi';
 import Sidebar from './components/sidebar';
 import { orders } from '../data/data';
-
-import { Product } from '@/types/Product';
-import { Order } from '@/types/Order';
-
-
-
-
 
 const DashboardHome = () => {
     const [activePage, setActivePage] = useState('dashboard');

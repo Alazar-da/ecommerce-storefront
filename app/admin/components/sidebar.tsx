@@ -1,6 +1,6 @@
 'use client';
 import React,{useState} from 'react'
-import { FiHome, FiBox, FiShoppingCart, FiUsers, FiSettings, FiPieChart, FiLogOut, FiMenu, FiX, FiEdit, FiTrash2, FiPlus, FiSearch, FiUser } from 'react-icons/fi';
+import { FiHome, FiBox, FiShoppingCart, FiUsers, FiSettings, FiPieChart, FiLogOut, FiMenu, FiX, FiUser } from 'react-icons/fi';
 import Link from 'next/link';
 import { useSession, signOut } from "next-auth/react";
 

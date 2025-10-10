@@ -6,6 +6,7 @@ export interface Order {
   totalAmount: number;
   status: "pending" | "paid" | "shipped" | "completed" | "cancelled" | "refunded";
   paymentMethod?: string;
+  paymentIntentId?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { Order } from "@/types/Order";
 
 export default function AdminOrderDetails() {
   const params = useParams() as { id: string };
-  const router = useRouter();
   const id = params.id;
-  const [order, setOrder] = useState<any | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
@@ -113,7 +113,7 @@ export default function AdminOrderDetails() {
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+  {/*       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm mb-1">Carrier</label>
             <input type="text" defaultValue={order.shipping?.carrier || ""} className="border rounded px-3 py-2 w-full" id="carrier" />
@@ -122,7 +122,7 @@ export default function AdminOrderDetails() {
             <label className="block text-sm mb-1">Tracking #</label>
             <input type="text" defaultValue={order.shipping?.trackingNumber || ""} className="border rounded px-3 py-2 w-full" id="tracking" />
           </div>
-        </div>
+        </div> */}
 
         <div className="mt-4 flex gap-2">
           <button

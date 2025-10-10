@@ -4,17 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import Sidebar from '../components/sidebar';
-
-type Order = {
-  _id: string;
-  userId: string;
-  totalAmount: number; // cents
-  status: string;
-  refunded?: boolean;
-  createdAt: string;
-  items: { name: string; quantity: number; price: number }[];
-  shipping?: { carrier?: string; trackingNumber?: string };
-};
+import { Order } from "@/types/Order";
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);

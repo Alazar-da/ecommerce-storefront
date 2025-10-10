@@ -9,7 +9,7 @@ import { Category } from "@/types/Category";
 interface ProductFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (product: any) => void;
+  onSave: (product: Product) => void;
   initialData?: Product | null;
 }
 

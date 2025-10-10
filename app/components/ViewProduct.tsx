@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Product } from '@/types/Product';
 import {formatPrice} from '@/utils/formatPrice';
-import { addRatingToProduct } from "@/utils/addRating";
 import RatingPopup from './RatingPopup';
 import Link from 'next/link';
 

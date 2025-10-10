@@ -1,13 +1,12 @@
 "use client";
 import React, { useState,useEffect } from 'react';
-import {  FiGrid, FiList, FiEdit, FiTrash2, FiPlus, FiSearch, FiEye } from 'react-icons/fi';
+import {  FiGrid, FiList, FiEdit, FiTrash2, FiSearch, FiEye } from 'react-icons/fi';
 import DeletePopup from '../components/DeletePopup';
 import ViewPopup from '../components/ViewPopup';
 import Sidebar from '../components/sidebar';
 import ProductFormModal from "../components/ProductFormModal";
 import {Product} from "@/types/Product";
 import { Category } from "@/types/Category";
-import { Order } from '@/types/Order';
 import {shortDate} from '@/utils/date';
 import { toast } from 'react-toastify';
 import { formatPrice } from '@/utils/formatPrice';
@@ -59,25 +58,9 @@ const ProductPage = () => {
   }, [search, categoryId]);
 
 
- // Fetch single category
-/* const fetchCategoryById = async (categoryId: string) => {
-  try {
-    const response = await fetch(`/api/categories/${categoryId}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch category');
-    }
-    const category = await response.json();
-    return category.name;
-  } catch (error) {
-    console.error('Error fetching category:', error);
-    return null;
-  }
-}; */
-
-
   const [deletePopup, setDeletePopup] = useState({
     isOpen: false,
-    id: null as number | null,
+    id: null as string | null,
     name: ''
   });
    const [viewPopup, setViewPopup] = useState({
@@ -90,7 +73,7 @@ const ProductPage = () => {
 
    const [isOpen, setIsOpen] = useState(false);
 
-  const handleSave = (product: any) => {
+  const handleSave = (product: Product) => {
     console.log("Saved product:", product);
     // 👉 send product to your API / MongoDB here
   };
@@ -130,7 +113,7 @@ const ProductPage = () => {
   };
 
   // Function to open the delete popup
-  const handleDeleteClick = (id: number, name: string) => {
+  const handleDeleteClick = (id: string, name: string) => {
     setDeletePopup({
       isOpen: true,
       id,
@@ -306,8 +289,8 @@ const ProductPage = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((product: any) => (
-                  <tr key={product.id}>
+              {products.map((product: Product) => (
+                  <tr key={product._id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="">
@@ -370,8 +353,8 @@ const ProductPage = () => {
         {viewMode === 'card' && (
           <div className="p-4 overflow-y-auto md:h-[70vh] w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {products.map((product: any) => (
-                <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                {products.map((product: Product) => (
+                <div key={product._id} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                   <div className="p-4">
                     <div className="flex items-start">
                       <div className="ml-4 flex-1">
@@ -388,7 +371,7 @@ const ProductPage = () => {
                         <div className="mt-2 flex items-center">
                           <span className="text-sm font-medium">{formatPrice(product.price,product.currency)}</span>
                           <span className="mx-2 text-gray-300">•</span>
-                          <span className="text-sm text-gray-500">{product.category}</span>
+                          <span className="text-sm text-gray-500">{product.categoryId.name}</span>
                         </div>
                         <div className="mt-2">
                           <span className={`px-2 py-1 text-xs font-medium inline-flex rounded-full ${
@@ -420,7 +403,7 @@ const ProductPage = () => {
                       </button>
                       <button 
                         className="text-red-600 hover:text-red-900 p-1 hover:cursor-pointer"
-                        onClick={() => handleDeleteClick(product.id, product.name)}
+                        onClick={() => handleDeleteClick(product._id, product.name)}
                         aria-label="Delete product"
                       >
                         <FiTrash2 className="text-lg" title={`Delete ${product.name}`} />
