@@ -33,7 +33,7 @@ const ProfilePage = ({ id }: { id: string }) => {
 
 const fetchUserProfile = async (id: string) => {
   try {
-    const response = await fetch(`/api/user/${id}`);
+    const response = await fetch(`/api/user/getuser?id=${id}`);
     const data = await response.json();
 
     if (!response.ok) {

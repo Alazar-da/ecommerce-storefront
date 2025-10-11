@@ -16,7 +16,7 @@ export async function fetchCategoryById(id: string): Promise<CategoryType | null
   try {
     if (!id) throw new Error("Category ID is required");
 
-    const res = await fetch(`/api/category/${id}`, {
+    const res = await fetch(`/api/category?id=${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

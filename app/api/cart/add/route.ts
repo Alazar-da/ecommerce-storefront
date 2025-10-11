@@ -1,4 +1,4 @@
-// /pages/api/cart/add.ts
+// /pages/api/cart/route.ts
 import { NextResponse } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Cart from "@/models/Cart";
@@ -27,6 +27,7 @@ export async function POST(req: Request) {
       cart = new Cart({
         user: userId,
         items: [],
+        totalQuantity: 0,
         total: 0,
       });
     }
@@ -50,6 +51,7 @@ export async function POST(req: Request) {
 
     // Recalculate total
     cart.total = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    cart.totalQuantity = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
     await cart.save();
 

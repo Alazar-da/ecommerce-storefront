@@ -24,7 +24,7 @@ export async function GET(req: Request) {
 
     // Extract query params (categoryId & search)
     const { searchParams } = new URL(req.url);
-    const categoryId = searchParams.get("categoryId");
+    const categoryId = searchParams.get("id");
     const search = searchParams.get("search");
 
     // Build query object

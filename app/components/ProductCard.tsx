@@ -50,6 +50,7 @@ const handleAddToCart = async (product: Product) => {
     const updatedCart = await response.json();
     setCart(updatedCart);
     toast.success(`${product.name} added to cart!`);
+   window.location.reload()
   } catch (error: any) {
     console.error('Error adding to cart:', error);
     toast.error('Failed to add item to cart');
@@ -73,7 +74,7 @@ const handleAddToCart = async (product: Product) => {
   };
     const handleProductView = (product: Product) => {
       if (user) {
-        route.push(`/products/${product._id}`);
+        route.push(`/products/viewproduct?id=${product._id}`);
       } else {
         toast.info('Please log in to view this product');
       }

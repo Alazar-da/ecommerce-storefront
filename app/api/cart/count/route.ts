@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Cart from "@/models/Cart"; // Make sure you have a Cart model
-import { useSession } from "next-auth/react";
 
-export async function GET(  req: Request,
-  { params }: { params: { id: string } }) {
+export async function GET(  req: Request) {
   try {
     await connectDB();
 
-       const { id } = params;
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
 
     const cart = await Cart.findOne({ user: id });
     const itemCount = cart ? cart.items.reduce((total: number, item: any) => total + item.quantity, 0) : 0;

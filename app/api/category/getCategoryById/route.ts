@@ -4,12 +4,12 @@ import Category from "@/models/Category";
 
 // ✅ Get category by ID
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: Request
 ) {
   try {
     await connectDB();
-    const { id } = params;
+       const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
     
     // Validate ID
     if (!id) {
@@ -34,13 +34,12 @@ export async function GET(
 
 // ✅ Update category by ID
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: Request
 ) {
   try {
     await connectDB();
-    
-    const { id } = params;
+      const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
     const data = await req.json();
 
     if (!id) {
@@ -68,13 +67,13 @@ export async function PUT(
 
 // ✅ Delete category by ID
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: Request
 ) {
   try {
     await connectDB();
     
-    const { id } = params;
+   const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
 
     if (!id) {
       return NextResponse.json({ error: "Category ID is required" }, { status: 400 });

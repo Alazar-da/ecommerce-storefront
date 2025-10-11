@@ -15,6 +15,7 @@ interface ICartItem {
 export interface ICart extends Document {
   user: IUser["_id"]; // ref to User
   items: ICartItem[];
+  totalQuantity: number;
   total: number;
   createdAt: Date;
 }
@@ -42,6 +43,11 @@ const CartSchema: Schema<ICart> = new Schema(
         },
       },
     ],
+    totalQuantity: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
     total: {
       type: Number,
       required: true,

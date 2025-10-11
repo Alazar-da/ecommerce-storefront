@@ -77,7 +77,7 @@ export default function OrdersPage() {
           {orders.map((order) => (
             <div
               key={order._id}
-              onClick={() => (window.location.href = `/orders/${order._id}`)}
+              onClick={() => (window.location.href = `/orders/vieworder?id=${order._id}`)}
               className="p-5 border rounded-xl shadow-sm bg-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between hover:shadow-md transition hover:bg-cyan-50 hover:cursor-pointer"
             >
               <div>
@@ -116,7 +116,7 @@ export default function OrdersPage() {
                  {formatPrice(order.totalAmount,order.items[0].productId?.currency)}
                 </p>
                 <Link
-                  href={`/orders/${order._id}`}
+                  href={`/orders/vieworder?id=${order._id}`}
                   className="text-emerald-600 hover:underline text-sm"
                 >
                   View Details →

@@ -2,7 +2,7 @@ import { Product } from "@/types/Product";
 
 export async function fetchProductById(id: string): Promise<Product | null> {
   try {
-    const res = await fetch(`/api/product/${id}`, {
+    const res = await fetch(`/api/product/getproduct?id=${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

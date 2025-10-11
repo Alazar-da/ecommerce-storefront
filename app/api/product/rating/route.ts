@@ -3,13 +3,13 @@ import connectDB from "@/DB/connectDB";
 import Product from "@/models/Product";
 
 export async function POST(
- request: NextRequest,
-   params: { id: Promise<{ id: string }> } // Type params as a Promise
+ request: NextRequest
  ) {
   try {
     await connectDB();
     const { rating } = await request.json();
-    const { id } = await params.id;
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
 
     // Validate rating
     if (typeof rating !== "number" || rating < 0 || rating > 5) {

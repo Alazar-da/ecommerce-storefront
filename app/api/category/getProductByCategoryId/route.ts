@@ -3,14 +3,13 @@ import connectDB from "@/DB/connectDB";
 import Product from "@/models/Product";
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { categoryId: string } }
+  req: NextRequest
 ) {
   try {
     await connectDB();
 
-    const { categoryId } = params;
     const { searchParams } = new URL(req.url);
+    const categoryId = searchParams.get("id");
     const search = searchParams.get("search");
 
     if (!categoryId || categoryId === "undefined") {

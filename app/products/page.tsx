@@ -39,7 +39,7 @@ const fetchProducts = async (id: string) => {
     setLoading(true);
     setError(null);
 
-    const response = await fetch(`/api/category/getProductByCategoryId/${id}`);
+    const response = await fetch(`/api/category/getProductByCategoryId?id=${id}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch products");

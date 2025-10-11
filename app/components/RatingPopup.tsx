@@ -43,7 +43,7 @@ export default function RatingPopup({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition hover:cursor-pointer"
         >
           <FiX size={22} />
         </button>

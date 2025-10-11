@@ -4,6 +4,7 @@ import Order from "@/models/Order";
 import Product from "@/models/Product";
 import User from "@/models/User";
 
+// ✅ Create new order
 export async function POST(req: Request) {
   try {
     await connectDB();

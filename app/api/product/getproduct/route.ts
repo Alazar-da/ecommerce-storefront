@@ -4,12 +4,13 @@ import Product from "@/models/Product";
 
 // ✅ Get single product by ID
 export async function GET(
- request: NextRequest,
-   params: { id: Promise<{ id: string }> } // Type params as a Promise
+ request: NextRequest
  ) {
   try {
     await connectDB();
-    const product = await Product.findById(params.id).populate("categoryId");
+            const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const product = await Product.findById(id).populate("categoryId");
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }

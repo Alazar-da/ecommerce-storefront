@@ -53,7 +53,10 @@ export default function FeaturedProducts() {
     console.log('Added to wishlist:', productId);
   };
 
-  if (loading) return <p>Loading featured products...</p>;
+  <div className="flex justify-center items-center py-12">
+    <span className="animate-spin rounded-full h-8 w-8 border-t-4 border-emerald-500 border-solid mr-4"></span>
+    <p className="text-emerald-600 text-lg font-semibold">Loading featured products...</p>
+  </div>
 
   return (
 

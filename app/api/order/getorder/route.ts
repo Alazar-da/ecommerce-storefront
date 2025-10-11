@@ -2,13 +2,13 @@ import { NextResponse,NextRequest } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Order from "@/models/Order";
 
-export async function GET(request: NextRequest,
-  params: { id: Promise<{ id: string }> } // Type params as a Promise
+export async function GET(request: NextRequest
 ) {
   try {
     await connectDB();
-
-    const order = await Order.findById(params.id)
+ const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const order = await Order.findById(id)
       .populate("userId")
       .populate({
         path: "items.productId",
@@ -78,7 +78,6 @@ export async function PUT(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
 
 // ✅ Delete order
 export async function DELETE(request: NextRequest,

@@ -1,15 +1,19 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ViewProduct from "../../components/ViewProduct";
 import { fetchProductById } from "@/utils/fetchProductById";
 import { Product } from "@/types/Product";
+import type { NextRequest } from "next/server";
+
+
 
 const ProductPage: React.FC = () => {
   const [product, setProduct] = useState<Product>();
-  const params = useParams();
-  const productId = params.id as string;
-  console.log("Product ID from params:", productId);
+  const searchParams = useSearchParams();
+  const productId = searchParams.get("id") ?? undefined;
+
+  console.log("Product ID from searchParams:", productId);
 
   useEffect(() => {
     if (!productId) return;

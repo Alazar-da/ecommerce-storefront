@@ -1,43 +1,75 @@
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Cart from "@/models/Cart";
 
-export async function PUT(req: Request) {
+export async function GET(
+request: NextRequest,
+) {
   try {
     await connectDB();
-    const { cartId, productId, quantity } = await req.json();
+     const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const cart = await Cart.findOne({ user: id })
+      .populate({
+        path: "items.productId",
+        select: "name price imageUrl stock rating averageRating", // fields you want
+      });
 
-    const cart = await Cart.findById(cartId);
-    if (!cart) return NextResponse.json({ error: "Cart not found" }, { status: 404 });
-
-    const item = cart.items.find((i) => i.productId.toString() === productId);
-    if (!item) return NextResponse.json({ error: "Item not found" }, { status: 404 });
-
-    item.quantity = quantity;
-    cart.total = cart.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    await cart.save();
+    if (!cart) {
+      return NextResponse.json({ error: "Cart not found" }, { status: 404 });
+    }
 
     return NextResponse.json(cart, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
-export async function DELETE(req: Request) {
+
+// ✅ Update Cart by userId
+export async function PUT(
+ request: NextRequest,
+) {
   try {
     await connectDB();
-    const { cartId, productId } = await req.json();
+ const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const { items, totalQuantity, totalPrice } = await request.json();
 
-    const cart = await Cart.findById(cartId);
-    if (!cart) return NextResponse.json({ error: "Cart not found" }, { status: 404 });
+const cart = await Cart.findOneAndUpdate(
+  { user: id }, // match by user if that's your schema
+  { items, totalQuantity, total: totalPrice }, // ✅ map totalPrice → total
+  { new: true, upsert: true }
+);
 
-    cart.items = cart.items.filter((i) => i.productId.toString() !== productId);
-    cart.total = cart.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    await cart.save();
 
     return NextResponse.json(cart, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
+
+// ✅ Delete Cart
+export async function DELETE(
+ request: NextRequest
+) {
+  try {
+    await connectDB();
+     const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    const deletedCart = await Cart.findOneAndDelete({ userId: id });
+    if (!deletedCart) {
+      return NextResponse.json({ error: "Cart not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(
+      { message: "Cart deleted successfully" },
+      { status: 200 }
+    );
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 

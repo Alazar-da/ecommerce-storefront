@@ -42,7 +42,7 @@ const CheckoutPage = ({ order }: { order: Order }) => {
     // ✅ Step 3: If payment is successful → update order status in DB
     if (paymentIntent && paymentIntent.status === "succeeded") {
       try {
-        const response = await fetch(`/api/order/${order._id}`, {
+        const response = await fetch(`/api/order?id=${order._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

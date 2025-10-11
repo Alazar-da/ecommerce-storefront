@@ -17,7 +17,7 @@ const Header = () => {
   useEffect(() => {
     const fetchCartCount = async () => {
       try {
-        const res = await fetch(`/api/cart/count/${session?.user.id}`);
+        const res = await fetch(`/api/cart/count?id=${session?.user.id}`);
         const data = await res.json();
         setCartCount(data.count);
       } catch (error) {
@@ -144,9 +144,9 @@ const Header = () => {
                 className="p-3 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 relative group"
               >
                 <FiShoppingCart className="text-xl" />
-                <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                {cartCount!==0? <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center transform group-hover:scale-110 transition-transform">
                   {cartCount}
-                </span>
+                </span>:null}
                 <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                   Cart
                 </span>
@@ -221,7 +221,7 @@ const Header = () => {
                             signOut();
                             handleMobileLinkClick();
                           }}
-                          className="flex items-center w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-all duration-200 rounded-lg mx-2"
+                          className="flex items-center w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-all duration-200 rounded-lg mx-2 hover:cursor-pointer"
                         >
                           <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3">
                             <FiLogOut className="text-red-600" />
@@ -349,14 +349,14 @@ const Header = () => {
                     </div>
                     <Link 
                       href="/profile" 
-                      className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200"
+                      className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 hover:cursor-pointer"
                       onClick={handleMobileLinkClick}
                     >
                       <FiUser className="mr-3" /> Profile
                     </Link>
                     <Link 
                       href="/orders" 
-                      className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200"
+                      className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 hover:cursor-pointer"
                       onClick={handleMobileLinkClick}
                     >
                       <FiShoppingCart className="mr-3" /> Orders
@@ -366,7 +366,7 @@ const Header = () => {
                         signOut();
                         handleMobileLinkClick();
                       }}
-                      className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                      className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 hover:cursor-pointer"
                     >
                       <FiLogOut className="mr-3" /> Logout
                     </button>
@@ -375,7 +375,7 @@ const Header = () => {
                   <div className="space-y-2">
                     <Link 
                       href="/login"
-                      className="flex items-center px-4 py-3 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 font-medium"
+                      className="flex items-center px-4 py-3 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 font-medium hover:cursor-pointer"
                       onClick={handleMobileLinkClick}
                     >
                       <FiLogIn className="mr-3" /> Login

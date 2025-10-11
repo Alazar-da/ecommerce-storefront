@@ -1,6 +1,6 @@
 export async function addRatingToProduct(productId: string, rating: number) {
   try {
-    const res = await fetch(`/api/product/${productId}/rating`, {
+    const res = await fetch(`/api/product/rating?id=${productId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ rating }),

@@ -9,6 +9,7 @@ import CheckoutPage from "../../components/CheckoutPage";
 import convertToSubcurrency from "@/utils/convertToSubcurrency";
 import { Order } from "@/types/Order";
 import { formatPrice } from "@/utils/formatPrice";
+import { useSearchParams } from "next/navigation";
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined");
@@ -19,7 +20,8 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
 
 export default function OrderDetailPage() {
-  const { id } = useParams();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id") ?? undefined;
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [clientSecret, setClientSecret] = useState("");
@@ -28,7 +30,7 @@ export default function OrderDetailPage() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await fetch(`/api/order/${id}`);
+        const res = await fetch(`/api/order/getorder?id=${id}`);
         if (!res.ok) throw new Error("Failed to fetch order details");
         const data = await res.json();
         setOrder(data);
@@ -57,7 +59,7 @@ export default function OrderDetailPage() {
     if (id) fetchOrder();
   }, [id]);
 
- console.log(order); 
+  console.log("order:", order);
   if (loading)
     return (
       <section className="min-h-screen flex items-center justify-center bg-gray-50">
