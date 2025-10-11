@@ -5,12 +5,11 @@ import type { NextRequest } from "next/server";
 
 export async function GET(
  request: NextRequest,
-  { params }: { params: { id: string } }  // ✅ Correct typing
-
 ) {
   try {
     await connectDB();
-    const { id } = params;
+        const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
     const order = await Order.findById(id).lean();
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -25,11 +24,12 @@ export async function GET(
 
 
 export async function PUT( request: NextRequest,
-  { params }: { params: { id: string } }  // ✅ Correct typing
 ) {
   try {
     await connectDB();
     const body = await request.json();
+        const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
     // allowed updates: status, shipping, tracking, payment info
     const updatePayload: any = {};
     if (body.status) updatePayload.status = body.status;
@@ -37,7 +37,7 @@ export async function PUT( request: NextRequest,
     if (typeof body.refunded === "boolean") updatePayload.refunded = body.refunded;
     if (body.paymentMethod) updatePayload.paymentMethod = body.paymentMethod;
 
-    const order = await Order.findByIdAndUpdate(params.id, updatePayload, { new: true }).lean();
+    const order = await Order.findByIdAndUpdate(id, updatePayload, { new: true }).lean();
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
     return NextResponse.json(order, { status: 200 });
   } catch (err: any) {
@@ -46,12 +46,13 @@ export async function PUT( request: NextRequest,
   }
 }
 
-export async function DELETE( request: NextRequest,
-  { params }: { params: { id: string } }  // ✅ Correct typing
+export async function DELETE( request: NextRequest
 ) {
   try {
     await connectDB();
-    const deleted = await Order.findByIdAndDelete(params.id);
+        const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const deleted = await Order.findByIdAndDelete(id);
     if (!deleted) return NextResponse.json({ error: "Order not found" }, { status: 404 });
     return NextResponse.json({ message: "Deleted" }, { status: 200 });
   } catch (err: any) {
