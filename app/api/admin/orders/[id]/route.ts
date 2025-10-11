@@ -1,14 +1,12 @@
 // app/api/admin/orders/[id]/route.ts
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Order from "@/models/Order";
 
-function requireAdmin(req: Request) {
-  // TODO: implement admin auth
-  return;
-}
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
+) {
   try {
     /* requireAdmin(req); */
     await connectDB();
@@ -23,7 +21,6 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
-    requireAdmin(req);
     await connectDB();
     const body = await req.json();
     // allowed updates: status, shipping, tracking, payment info
@@ -44,7 +41,6 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
-    requireAdmin(req);
     await connectDB();
     const deleted = await Order.findByIdAndDelete(params.id);
     if (!deleted) return NextResponse.json({ error: "Order not found" }, { status: 404 });

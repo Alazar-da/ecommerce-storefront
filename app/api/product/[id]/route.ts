@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Product from "@/models/Product";
 
 // ✅ Get single product by ID
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+ request: NextRequest,
+   params: { id: Promise<{ id: string }> } // Type params as a Promise
+ ) {
   try {
     await connectDB();
     const product = await Product.findById(params.id).populate("categoryId");
@@ -21,12 +21,12 @@ export async function GET(
 
 // ✅ Update product by ID
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+ request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
 ) {
   try {
     await connectDB();
-    const data = await req.json();
+    const data = await request.json();
 
     const updatedProduct = await Product.findByIdAndUpdate(params.id, data, {
       new: true,
@@ -42,12 +42,13 @@ export async function PUT(
 
 // ✅ Delete product by ID
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
 ) {
   try {
     await connectDB();
-    const deletedProduct = await Product.findByIdAndDelete(params.id);
+    const { id } = await params.id;
+    const deletedProduct = await Product.findByIdAndDelete(id);
     if (!deletedProduct) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }

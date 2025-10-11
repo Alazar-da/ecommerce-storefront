@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Order from "@/models/Order";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
+) {
   try {
     await connectDB();
 
@@ -43,12 +45,12 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
 // ✅ Update order
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+ request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
 ) {
   try {
     await connectDB();
-    const { status, shipping, paymentMethod } = await req.json();
+    const { status, shipping, paymentMethod } = await request.json();
 
     // ✅ Validate status
     const allowedStatuses = ["pending", "paid", "shipped", "completed", "cancelled", "refunded"];
@@ -79,7 +81,9 @@ export async function PUT(
 
 
 // ✅ Delete order
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
+) {
   try {
     await connectDB();
     const deletedOrder = await Order.findByIdAndDelete(params.id);

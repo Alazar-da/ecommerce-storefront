@@ -1,5 +1,5 @@
 // app/api/admin/orders/[id]/refund/route.ts
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Order from "@/models/Order";
 import Stripe from "stripe";
@@ -11,11 +11,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", { apiVersion: "20
   return;
 } */
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
+) {
   try {
     /* requireAdmin(req); */
     await connectDB();
-    const order = await Order.findById(params.id);
+    const order = await Order.findById(await params.id);
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
     if (!order.paymentIntentId) {

@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Cart from "@/models/Cart";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
+
 ) {
   try {
     await connectDB();
@@ -29,14 +30,14 @@ export async function GET(
 
 // ✅ Update Cart by userId
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+ request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
 ) {
   try {
     await connectDB();
-    const { id } = params;
- 
-const { items, totalQuantity, totalPrice } = await req.json();
+    const { id } = await params.id;
+
+    const { items, totalQuantity, totalPrice } = await request.json();
 
 const cart = await Cart.findOneAndUpdate(
   { user: id }, // match by user if that's your schema
@@ -54,12 +55,12 @@ const cart = await Cart.findOneAndUpdate(
 
 // ✅ Delete Cart
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+ request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
 ) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await params.id;
 
     const deletedCart = await Cart.findOneAndDelete({ userId: id });
     if (!deletedCart) {

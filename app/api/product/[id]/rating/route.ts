@@ -1,15 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Product from "@/models/Product";
 
 export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+ request: NextRequest,
+   params: { id: Promise<{ id: string }> } // Type params as a Promise
+ ) {
   try {
     await connectDB();
-    const { rating } = await req.json();
-    const { id } = params;
+    const { rating } = await request.json();
+    const { id } = await params.id;
 
     // Validate rating
     if (typeof rating !== "number" || rating < 0 || rating > 5) {

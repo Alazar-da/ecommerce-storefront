@@ -4,11 +4,13 @@ import Order from "@/models/Order";
 import type { NextRequest } from "next/server";
 
 export async function GET(
-  { params }: { params: { id: string } }
+ request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
+
 ) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await params.id;
     const order = await Order.findById(id).lean();
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -22,10 +24,12 @@ export async function GET(
 }
 
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
+) {
   try {
     await connectDB();
-    const body = await req.json();
+    const body = await request.json();
     // allowed updates: status, shipping, tracking, payment info
     const updatePayload: any = {};
     if (body.status) updatePayload.status = body.status;
@@ -42,7 +46,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
+) {
   try {
     await connectDB();
     const deleted = await Order.findByIdAndDelete(params.id);

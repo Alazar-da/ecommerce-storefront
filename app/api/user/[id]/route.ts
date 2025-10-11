@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import connectDB from "@/DB/connectDB";
 import User from "@/models/User";
 
 // ✅ Get user by ID
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: { id: Promise<{ id: string }> } }) {
   try {
     await connectDB();
 
@@ -20,12 +20,12 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
 // ✅ Update user by ID
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+ request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
 ) {
   try {
     await connectDB();
-    const updateData = await req.json();
+    const updateData = await request.json();
 
     const updatedUser = await User.findByIdAndUpdate(params.id, updateData, {
       new: true,
@@ -41,12 +41,13 @@ export async function PUT(
 
 // ✅ Delete user by ID
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  params: { id: Promise<{ id: string }> } // Type params as a Promise
 ) {
   try {
     await connectDB();
-    const deletedUser = await User.findByIdAndDelete(params.id);
+    const { id } = await params.id;
+    const deletedUser = await User.findByIdAndDelete(id);
 
     if (!deletedUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
