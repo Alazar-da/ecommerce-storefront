@@ -12,12 +12,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", { apiVersion: "20
 } */
 
 export async function POST(request: NextRequest,
-  params: { id: Promise<{ id: string }> } // Type params as a Promise
 ) {
   try {
     /* requireAdmin(req); */
     await connectDB();
-    const order = await Order.findById(await params.id);
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
+    const order = await Order.findById(id);
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
     if (!order.paymentIntentId) {
