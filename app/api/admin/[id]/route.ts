@@ -2,16 +2,15 @@ import { NextResponse } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Order from "@/models/Order";
 import type { NextRequest } from "next/server";
-import { use } from "react";
 
 export async function GET(
  request: NextRequest,
-  params: { id: Promise<{ id: string }> } // Type params as a Promise
+  { params }: { params: { id: string } }  // ✅ Correct typing
 
 ) {
   try {
     await connectDB();
-    const { id } = use(params.id);
+    const { id } = params;
     const order = await Order.findById(id).lean();
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -25,8 +24,8 @@ export async function GET(
 }
 
 
-export async function PUT(request: NextRequest,
-  params: { id: Promise<{ id: string }> } // Type params as a Promise
+export async function PUT( request: NextRequest,
+  { params }: { params: { id: string } }  // ✅ Correct typing
 ) {
   try {
     await connectDB();
@@ -47,8 +46,8 @@ export async function PUT(request: NextRequest,
   }
 }
 
-export async function DELETE(request: NextRequest,
-  params: { id: Promise<{ id: string }> } // Type params as a Promise
+export async function DELETE( request: NextRequest,
+  { params }: { params: { id: string } }  // ✅ Correct typing
 ) {
   try {
     await connectDB();
