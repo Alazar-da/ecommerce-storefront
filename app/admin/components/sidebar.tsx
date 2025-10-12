@@ -2,7 +2,9 @@
 import React,{useState} from 'react'
 import { FiHome, FiBox, FiShoppingCart, FiUsers, FiSettings, FiPieChart, FiLogOut, FiMenu, FiX, FiUser } from 'react-icons/fi';
 import Link from 'next/link';
-import { useSession, signOut } from "next-auth/react";
+import{useSession,signOut} from '@/utils/useSession';
+
+
 
 const Sidebar = ({ activePage, setActivePage }: { 
   activePage: string, 
@@ -18,7 +20,7 @@ const Sidebar = ({ activePage, setActivePage }: {
     { id: 'settings', label: 'Settings', path:"/settings", icon: <FiSettings className="text-lg" /> },
   ];
  const [sidebarOpen, setSidebarOpen] = useState(false);
-   const { data: session, status } = useSession();
+  const { user }: { user: any } = useSession();
   return (
     <>
       {/* Mobile overlay */}
@@ -68,13 +70,11 @@ const Sidebar = ({ activePage, setActivePage }: {
           <div className='text-sm'>
             <div className="flex items-center">
               <FiUser className="text-gray-300 mr-2 text-lg" />
-              <span className="text-gray-300 font-medium">{session?.user?.name || 'Admin User'}</span>
+              <span className="text-gray-300 font-medium">{user?.name || 'Admin User'}</span>
             </div>
           </div>
           <button onClick={() => {
-                        signOut({
-  callbackUrl: "/",         // 👈 redirect URL after sign out
-});
+                        signOut();
                         
                       }} className="flex items-center w-full px-4 py-2 text-left text-gray-300 hover:text-red-300 hover:cursor-pointer">
             <FiLogOut className="mr-3 text-lg" />

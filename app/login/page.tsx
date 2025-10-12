@@ -33,13 +33,14 @@ const LoginPage = () => {
     setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setIsLoading(true);
 
+  // ✅ 1. Validate fields
   const newErrors = {
-    email: validateField("email", formData.email),
-    password: validateField("password", formData.password),
+    email: validateField("Email", formData.email),
+    password: validateField("Password", formData.password),
   };
   setErrors(newErrors);
 
@@ -49,34 +50,45 @@ const LoginPage = () => {
     return;
   }
 
-  const res = await signIn("credentials", {
-    redirect: false,
+  // ✅ 2. Sign in with credentials
+/*   const res = await signIn("credentials", {
+    redirect: false, // important!
     email: formData.email,
     password: formData.password,
+  }); */
+
+
+  // ✅ 3. Handle sign-in response
+/*   if (!res || res.error) {
+    toast.error(res?.error || "Invalid email or password");
+    return;
+  } */
+
+
+
+  // ✅ 4. Fetch the session after login
+  try {
+  const res = await fetch("/api/auth", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: formData.email, password: formData.password }),
   });
 
-  setIsLoading(false);
+  const data = await res.json();
 
-  if (res?.error) {
-    toast.error(res.error || "Invalid email or password");
-  } else {
+  if (!data.success) return toast.error(data.error);
+
+  // Save token to localStorage or cookie
+  localStorage.setItem("token", data.token);
     toast.success("Login successful!");
+      setIsLoading(false);
 
-    // ✅ Get session to check role
-    const session = await fetch("/api/auth/session").then((r) => r.json());
-    console.log("User session:", session);
 
-    setTimeout(() => {
-      if (session) {
-        if (session?.user?.role === "admin") {
-          router.push("/admin");
-        } else {
-          router.push("/"); // default for customers
-        }
-      } else {
-        router.push("/login");
-    }
-    }, 1500);
+  if (data.user.role === "admin") router.push("/admin");
+  else router.push("/");
+  } catch (error) {
+    console.error("Error fetching session:", error);
+    toast.error("An unexpected error occurred");
   }
 };
 

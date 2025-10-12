@@ -1,9 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Category } from '@/types/Category';
-import { useSession } from "next-auth/react";
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import { useSession } from '@/utils/useSession';
 
 
 function CategorySection() {
@@ -11,8 +11,7 @@ function CategorySection() {
   const route = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { data: session } = useSession();
-  const user = session?.user;
+  const { user }: { user: any } = useSession();
 
 
   useEffect(() => {

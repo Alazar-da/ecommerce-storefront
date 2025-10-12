@@ -1,14 +1,15 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX, FiLogOut, FiLogIn, FiUserPlus } from 'react-icons/fi';
-import { useSession, signOut } from "next-auth/react";
+import { useSession, signOut } from "@/utils/useSession";
 import Link from 'next/link';
+
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const { data: session } = useSession();
+  const { user }: { user: any } = useSession();
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -17,7 +18,7 @@ const Header = () => {
   useEffect(() => {
     const fetchCartCount = async () => {
       try {
-        const res = await fetch(`/api/cart/count?id=${session?.user.id}`);
+        const res = await fetch(`/api/cart/count?id=${user.id}`);
         const data = await res.json();
         setCartCount(data.count);
       } catch (error) {
@@ -26,7 +27,7 @@ const Header = () => {
     };
 
     fetchCartCount();
-  }, [session]);
+  }, [user?.id]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -138,7 +139,7 @@ const Header = () => {
               ) : null} */}
 
               {/* Cart */}
-              {session?.user ? (
+              {user ? (
               <Link 
                 href="/cart" 
                 className="p-3 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 relative group"
@@ -160,14 +161,14 @@ const Header = () => {
                   onClick={handleUserActionClick}
                 >
                   <div className="relative">
-                    {session?.user ? (
+                    {user ? (
                       <div className="w-6 h-6 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                        {session.user.name?.charAt(0).toUpperCase()}
+                        {user.name?.charAt(0).toUpperCase()}
                       </div>
                     ) : (
                       <FiUser className="text-2xl" />
                     )}
-                    {session?.user && (
+                    {user && (
                       <span className="absolute -top-1 -right-1 bg-green-500 border-2 border-white rounded-full w-3 h-3"></span>
                     )}
                   </div>
@@ -179,11 +180,11 @@ const Header = () => {
                 {/* User Dropdown */}
                 {userDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl py-3 z-50 border border-gray-100 animate-fade-in">
-                    {session?.user ? (
+                    {user ? (
                       <>
                         <div className="px-4 py-3 border-b border-gray-100">
-                          <p className="text-sm font-semibold text-gray-900">{session.user.name}</p>
-                          <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
+                          <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
+                          <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                         </div>
                         
                         <Link 
@@ -341,11 +342,11 @@ const Header = () => {
 
               {/* Mobile user section */}
               <div className="mt-6 pt-4 border-t border-gray-200">
-                {session?.user ? (
+                {user ? (
                   <div className="space-y-2">
                     <div className="px-4 py-2">
-                      <p className="text-sm font-semibold text-gray-900">{session.user.name}</p>
-                      <p className="text-xs text-gray-500">{session.user.email}</p>
+                      <p className="text-sm font-semibold text-gray-900">{user.name}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
                     </div>
                     <Link 
                       href="/profile" 

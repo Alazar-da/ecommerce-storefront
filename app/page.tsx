@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React,{useEffect} from 'react';
 import { FiArrowRight } from 'react-icons/fi';
 import Header from './components/Header';
 import ProductCard from './components/ProductCard';
@@ -7,8 +8,20 @@ import CategorySection from './components/CategorySection';
 import HeroSection from './components/HeroSection';
 import AboutSection from './components/AboutSection';
 import FeaturedProducts from './components/FeaturedSection';
+import { useRouter } from 'next/navigation';
+import { fetchSession } from '@/utils/fetchSession';
 
 const HomePage = () => {
+  const router = useRouter();
+  useEffect(() => {
+  const getSession = async () => {
+    const user = await fetchSession();
+    if (!user) router.push("/login");
+    else console.log("Logged in user:", user);
+  };
+  getSession();
+}, []);
+
   return (
     <div className="min-h-screen flex flex-col text-slate-800">
       <Header />

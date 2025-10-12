@@ -1,11 +1,10 @@
 'use client'
 import React from 'react'
 import ProfilePage from '../components/ProfilePage'
-import { useSession } from "next-auth/react";
+import { useSession } from '@/utils/useSession';
 
 function Profile() {
-    const { data: session } = useSession();
-    const user = session?.user;
+  const { user }: { user: any } = useSession();
 
     if (!user) {
         return (

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/utils/useSession";
 import { Cart } from "@/types/Cart";
 import { Order } from "@/types/Order";
 import Link from "next/link";
@@ -11,8 +11,7 @@ export default function CartPage() {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [orderLoading, setOrderLoading] = useState(false);
-  const { data: session } = useSession();
-  const user = session?.user;
+   const { user }: { user: any } = useSession();
 
   // Fetch cart on user login
   useEffect(() => {

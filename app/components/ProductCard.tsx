@@ -1,6 +1,6 @@
 'use client';
 import {Product} from '@/types/Product';
-import { useSession } from "next-auth/react";
+import { useSession } from "@/utils/useSession";
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { formatPrice } from '@/utils/formatPrice';
@@ -12,16 +12,14 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-
-      const { data: session } = useSession();
-      const user = session?.user;
+  const { user }: { user: any } = useSession();
       const route = useRouter();
       const [cart, setCart] = useState<Cart | null>(null);
 
 
       console.log('Product in ProductCard:', product);
 const handleAddToCart = async (product: Product) => {
-  if (!session?.user) {
+  if (user) {
     toast.info('Please log in to add items to cart');
     return;
   }

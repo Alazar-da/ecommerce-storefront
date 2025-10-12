@@ -5,10 +5,10 @@ import { Product } from '@/types/Product';
 import {formatPrice} from '@/utils/formatPrice';
 import RatingPopup from './RatingPopup';
 import Link from 'next/link';
-import { useSession } from "next-auth/react";
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import {Cart} from '@/types/Cart';
+import { useSession } from '@/utils/useSession';
 
 
 interface ViewProductProps {
@@ -19,8 +19,7 @@ const ViewProduct: React.FC<ViewProductProps> = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
     const [isRatingOpen, setIsRatingOpen] = useState(false);
   const [avg, setAvg] = useState<number | null>(null);
-        const { data: session } = useSession();
-        const user = session?.user;
+       const { user }: { user: any } = useSession();
         const route = useRouter();
         const [cart, setCart] = useState<Cart | null>(null);
 
@@ -42,7 +41,7 @@ const ViewProduct: React.FC<ViewProductProps> = ({ product }) => {
   };
 
   const handleAddToCart = async (product: Product) => {
-    if (!session?.user) {
+    if (!user) {
       toast.info('Please log in to add items to cart');
       return;
     }
