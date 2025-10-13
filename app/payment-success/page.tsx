@@ -1,9 +1,13 @@
 import Link from "next/link";
-export default function PaymentSuccess({
-  searchParams: { amount },
-}: {
-  searchParams: { amount: string };
-}) {
+
+interface PaymentSuccessProps {
+  searchParams: {
+    amount?: string;
+  };
+}
+
+export default function PaymentSuccess({ searchParams }: PaymentSuccessProps) {
+  const amount = searchParams.amount ?? "0";
   return (
     <section className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center w-full">
        <nav className="flex absolute top-5 left-15 z-10" aria-label="Breadcrumb">
