@@ -1,15 +1,29 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiX, FiLogOut, FiLogIn, FiUserPlus } from 'react-icons/fi';
-import { useSession, signOut } from "@/utils/useSession";
+import { useAuthStore } from "@/store/useAuthStore";
 import Link from 'next/link';
-
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const { user }: { user: any } = useSession();
+  const router = useRouter();
+  const { user, logout }:{user:any, logout: () => void} = useAuthStore();
+
+   const signOut = () => {
+        toast.success("Logged out successfully");
+    setTimeout(() =>
+          {
+  localStorage.removeItem("token");
+   
+    logout();
+    router.push("/")
+    }, 2000)
+    setUserDropdownOpen(false);
+  };
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -218,6 +232,7 @@ const Header = () => {
                         <div className="border-t border-gray-100 my-2"></div>
                         
                         <button 
+                        type='button'
                           onClick={() => {
                             signOut();
                             handleMobileLinkClick();
@@ -362,7 +377,9 @@ const Header = () => {
                     >
                       <FiShoppingCart className="mr-3" /> Orders
                     </Link>
+
                     <button 
+                      type='button'
                       onClick={() => {
                         signOut();
                         handleMobileLinkClick();

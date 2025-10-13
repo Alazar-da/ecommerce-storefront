@@ -1,10 +1,10 @@
 'use client'
 import React from 'react'
 import ProfilePage from '../components/ProfilePage'
-import { useSession } from '@/utils/useSession';
+import { useAuthStore } from '@/store/useAuthStore';
 
 function Profile() {
-  const { user }: { user: any } = useSession();
+  const { user }: { user: any } = useAuthStore();
 
     if (!user) {
         return (

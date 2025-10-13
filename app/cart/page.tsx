@@ -1,8 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSession } from "@/utils/useSession";
+import { useAuthStore } from "@/store/useAuthStore";
 import { Cart } from "@/types/Cart";
-import { Order } from "@/types/Order";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { formatPrice } from "@/utils/formatPrice";
@@ -11,7 +10,7 @@ export default function CartPage() {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [orderLoading, setOrderLoading] = useState(false);
-   const { user }: { user: any } = useSession();
+   const { user }: { user: any } = useAuthStore();
 
   // Fetch cart on user login
   useEffect(() => {

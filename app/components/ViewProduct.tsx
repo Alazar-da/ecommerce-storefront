@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import {Cart} from '@/types/Cart';
-import { useSession } from '@/utils/useSession';
+import { useAuthStore } from '@/store/useAuthStore';
 
 
 interface ViewProductProps {
@@ -19,7 +19,7 @@ const ViewProduct: React.FC<ViewProductProps> = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
     const [isRatingOpen, setIsRatingOpen] = useState(false);
   const [avg, setAvg] = useState<number | null>(null);
-       const { user }: { user: any } = useSession();
+       const { user }: { user: any } = useAuthStore();
         const route = useRouter();
         const [cart, setCart] = useState<Cart | null>(null);
 

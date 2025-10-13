@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { signIn } from "next-auth/react";
+import { useAuthStore } from '@/store/useAuthStore';
 
 
 const LoginPage = () => {
@@ -50,23 +51,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     return;
   }
 
-  // ✅ 2. Sign in with credentials
-/*   const res = await signIn("credentials", {
-    redirect: false, // important!
-    email: formData.email,
-    password: formData.password,
-  }); */
-
-
-  // ✅ 3. Handle sign-in response
-/*   if (!res || res.error) {
-    toast.error(res?.error || "Invalid email or password");
-    return;
-  } */
-
-
-
-  // ✅ 4. Fetch the session after login
   try {
   const res = await fetch("/api/auth", {
     method: "POST",
@@ -80,6 +64,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   // Save token to localStorage or cookie
   localStorage.setItem("token", data.token);
+
+      // 4️⃣ Update global user state immediately
+  const { setUser } = useAuthStore.getState();
+setUser(data.user);
+
     toast.success("Login successful!");
       setIsLoading(false);
 

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Category } from '@/types/Category';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
-import { useSession } from '@/utils/useSession';
+import { useAuthStore } from '@/store/useAuthStore';
 
 
 function CategorySection() {
@@ -11,7 +11,7 @@ function CategorySection() {
   const route = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user }: { user: any } = useSession();
+  const { user }: { user: any } = useAuthStore();
 
 
   useEffect(() => {

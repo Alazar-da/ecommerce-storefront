@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import ViewProduct from "../../components/ViewProduct";
 import { fetchProductById } from "@/utils/fetchProductById";
 import { Product } from "@/types/Product";
-import type { NextRequest } from "next/server";
 
 
 

@@ -1,36 +1,29 @@
-import { NextResponse } from "next/server";
+// app/api/checkout/route.ts
+import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-09-30.clover",
+});
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { orderId, items } = await req.json();
+    const { amount, currency = "usd", orderId } = await req.json();
 
-    // Create line items from order items
-    const lineItems = items.map((item: any) => ({
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: item.product.name,
-          images: [item.product.image],
-        },
-        unit_amount: item.product.price * 100, // price in cents
-      },
-      quantity: item.quantity,
-    }));
+    if (!amount || !orderId) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/orders/${orderId}?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/orders/${orderId}?canceled=true`,
+    // ✅ Create a PaymentIntent on the server
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
       metadata: { orderId },
     });
 
-    return NextResponse.json({ id: session.id, url: session.url });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ clientSecret: paymentIntent.client_secret });
+  } catch (err: any) {
+    console.error("Stripe error:", err.message);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

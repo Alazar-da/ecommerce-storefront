@@ -2,7 +2,9 @@
 import React,{useState} from 'react'
 import { FiHome, FiBox, FiShoppingCart, FiUsers, FiSettings, FiPieChart, FiLogOut, FiMenu, FiX, FiUser } from 'react-icons/fi';
 import Link from 'next/link';
-import{useSession,signOut} from '@/utils/useSession';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 
 
@@ -20,7 +22,21 @@ const Sidebar = ({ activePage, setActivePage }: {
     { id: 'settings', label: 'Settings', path:"/settings", icon: <FiSettings className="text-lg" /> },
   ];
  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user }: { user: any } = useSession();
+  const router = useRouter();
+  
+  const { user, logout }:{user:any, logout: () => void} = useAuthStore();
+
+
+   const signOut = () => {
+        toast.success("Logged out successfully");
+    setTimeout(() =>
+          {
+  localStorage.removeItem("token");
+   
+    logout();
+    router.push("/")
+    }, 2000)
+  };
   return (
     <>
       {/* Mobile overlay */}
