@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Product } from '@/types/Product';
 import { Category } from '@/types/Category';
@@ -7,7 +8,7 @@ import { toast } from 'react-toastify';
 import Link from 'next/link';
 import ProductCard from '../components/ProductCard';
 
-function ProductsPage() {
+function ProductsPageContent() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,15 +16,13 @@ function ProductsPage() {
   const [sortBy, setSortBy] = useState<string>('name');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-
-  
   const searchParams = useSearchParams();
   const categoryId = searchParams.get('category');
 
   useEffect(() => {
     if (categoryId) {
       fetchProducts(categoryId);
-      console.log("Fetching products for category ID:", categoryId);
+      console.log('Fetching products for category ID:', categoryId);
     } else {
       setError('No category specified');
       setLoading(false);
@@ -34,45 +33,41 @@ function ProductsPage() {
     filterAndSortProducts();
   }, [products, sortBy, searchQuery]);
 
-const fetchProducts = async (id: string) => {
-  try {
-    setLoading(true);
-    setError(null);
+  const fetchProducts = async (id: string) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    const response = await fetch(`/api/category/getProductByCategoryId?id=${id}`);
+      const response = await fetch(`/api/category/getProductByCategoryId?id=${id}`);
+      if (!response.ok) throw new Error('Failed to fetch products');
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch products");
+      const productsData = await response.json();
+      setProducts(productsData);
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Error fetching products:', err);
+      toast.error('Failed to load products');
+    } finally {
+      setLoading(false);
     }
-
-    const productsData = await response.json();
-    setProducts(productsData);
-  } catch (err: any) {
-    setError(err.message);
-    console.error("Error fetching products:", err);
-    toast.error("Failed to load products");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Search is handled in the filterAndSortProducts useEffect
   };
 
   const filterAndSortProducts = () => {
     let filtered = [...products];
-    
-    // Apply search filter
+
+    // Search filter
     if (searchQuery) {
-      filtered = filtered.filter(product => 
+      filtered = filtered.filter((product) =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
-    // Apply sorting
+
+    // Sorting
     switch (sortBy) {
       case 'name':
         filtered.sort((a, b) => a.name.localeCompare(b.name));
@@ -84,22 +79,22 @@ const fetchProducts = async (id: string) => {
         filtered.sort((a, b) => b.price - a.price);
         break;
       case 'newest':
-        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        filtered.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
         break;
       default:
         break;
     }
-    
+
     setFilteredProducts(filtered);
   };
 
-
-
-
-  // Get category name from first product (since all products belong to same category)
-  const categoryName = products.length > 0 && products[0].categoryId 
-    ? (products[0].categoryId as Category).name 
-    : 'Products';
+  const categoryName =
+    products.length > 0 && products[0].categoryId
+      ? (products[0].categoryId as Category).name
+      : 'Products';
 
   if (loading) {
     return (
@@ -125,17 +120,17 @@ const fetchProducts = async (id: string) => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">Error Loading Products</h1>
-            <p className="text-red-600 mb-4">{error}</p>
-            <button
-              onClick={() => categoryId && fetchProducts(categoryId)}
-              className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-            >
-              Try Again
-            </button>
-          </div>
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            Error Loading Products
+          </h1>
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={() => categoryId && fetchProducts(categoryId)}
+            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );
@@ -174,13 +169,13 @@ const fetchProducts = async (id: string) => {
               {categoryName}
             </h1>
             <p className="text-gray-600">
-              {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+              {filteredProducts.length} product
+              {filteredProducts.length !== 1 ? 's' : ''} found
             </p>
           </div>
-          
-          {/* Search and Sort Controls */}
+
+          {/* Search & Sort */}
           <div className="flex flex-col sm:flex-row gap-4 mt-4 md:mt-0">
-            {/* Search Form */}
             <form onSubmit={handleSearch} className="flex">
               <input
                 type="text"
@@ -196,10 +191,12 @@ const fetchProducts = async (id: string) => {
                 Search
               </button>
             </form>
-            
-            {/* Sort Options */}
+
             <div className="flex items-center space-x-2">
-              <label htmlFor="sort" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+              <label
+                htmlFor="sort"
+                className="text-sm font-medium text-gray-700 whitespace-nowrap"
+              >
                 Sort by:
               </label>
               <select
@@ -217,7 +214,7 @@ const fetchProducts = async (id: string) => {
           </div>
         </div>
 
-        {/* Products Grid */}
+        {/* Product Grid */}
         {filteredProducts.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-400 text-6xl mb-4">
@@ -227,10 +224,9 @@ const fetchProducts = async (id: string) => {
               {searchQuery ? 'No Products Found' : 'No Products Available'}
             </h2>
             <p className="text-gray-600 mb-6">
-              {searchQuery 
+              {searchQuery
                 ? `No products found for "${searchQuery}" in this category.`
-                : 'There are no products available in this category at the moment.'
-              }
+                : 'There are no products available in this category at the moment.'}
             </p>
             {searchQuery && (
               <button
@@ -250,10 +246,7 @@ const fetchProducts = async (id: string) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-              />
+              <ProductCard key={product._id} product={product} />
             ))}
           </div>
         )}
@@ -262,4 +255,10 @@ const fetchProducts = async (id: string) => {
   );
 }
 
-export default ProductsPage;
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="text-center mt-20">Loading...</div>}>
+      <ProductsPageContent />
+    </Suspense>
+  );
+}
