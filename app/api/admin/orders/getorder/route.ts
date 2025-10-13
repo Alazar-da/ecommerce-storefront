@@ -1,4 +1,4 @@
-// app/api/admin/orders/[id]/route.ts
+// app/api/admin/orders/getorder/route.ts
 import { NextResponse,NextRequest } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Order from "@/models/Order";
@@ -7,7 +7,6 @@ import Order from "@/models/Order";
 export async function GET(request: NextRequest
 ) {
   try {
-    /* requireAdmin(req); */
     await connectDB();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");

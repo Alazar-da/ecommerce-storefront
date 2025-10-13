@@ -45,11 +45,13 @@ export async function GET(request: NextRequest
 
 // ✅ Update order
 export async function PUT(
- request: NextRequest,
-  params: { id: Promise<{ id: string }> } // Type params as a Promise
+ request: NextRequest
 ) {
   try {
     await connectDB();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
     const { status, shipping, paymentMethod } = await request.json();
 
     // ✅ Validate status
@@ -64,7 +66,7 @@ export async function PUT(
     if (paymentMethod) updateData.paymentMethod = paymentMethod;
     if (shipping) updateData.shipping = shipping;
 
-    const updatedOrder = await Order.findByIdAndUpdate(params.id, updateData, {
+    const updatedOrder = await Order.findByIdAndUpdate(id, updateData, {
       new: true,
     });
 
@@ -81,11 +83,12 @@ export async function PUT(
 
 // ✅ Delete order
 export async function DELETE(request: NextRequest,
-  params: { id: Promise<{ id: string }> } // Type params as a Promise
 ) {
   try {
     await connectDB();
-    const deletedOrder = await Order.findByIdAndDelete(params.id);
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const deletedOrder = await Order.findByIdAndDelete(id);
     if (!deletedOrder) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }

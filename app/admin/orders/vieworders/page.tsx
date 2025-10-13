@@ -1,4 +1,4 @@
-// app/admin/orders/[id]/page.tsx
+// app/admin/orders/vieworders/page.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -19,7 +19,7 @@ export default function AdminOrderDetails() {
   const fetchOrder = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/admin/orders/${id}`);
+      const res = await fetch(`/api/admin/orders/getorder?id=${id}`);
       if (!res.ok) throw new Error("Unable to fetch order");
       setOrder(await res.json());
     } catch (err: any) {
@@ -32,7 +32,7 @@ export default function AdminOrderDetails() {
   const updateOrder = async (payload: any) => {
     try {
       setUpdating(true);
-      const res = await fetch(`/api/admin/orders/${id}`, {
+      const res = await fetch(`/api/admin/orders/getorder?id=${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -51,10 +51,25 @@ export default function AdminOrderDetails() {
     }
   };
 
+  const deleteOrder = async (id: string) => {
+    if (!confirm("Delete this order?")) return;
+    try {
+      const res = await fetch(`/api/admin/orders/getorder?id=${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Delete failed");
+      }
+      toast.success("Deleted");
+      fetchOrder();
+    } catch (err: any) {
+      toast.error(err.message || "Delete failed");
+    }
+  };
+
   const refund = async () => {
     if (!confirm("Refund this order?")) return;
     try {
-      const res = await fetch(`/api/admin/orders/${id}/refund`, { method: "POST" });
+      const res = await fetch(`/api/admin/orders/refund?id=${id}`, { method: "POST" });
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.error || "Refund failed");

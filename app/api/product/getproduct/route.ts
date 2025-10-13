@@ -22,14 +22,15 @@ export async function GET(
 
 // ✅ Update product by ID
 export async function PUT(
- request: NextRequest,
-  params: { id: Promise<{ id: string }> } // Type params as a Promise
+ request: NextRequest
 ) {
   try {
     await connectDB();
     const data = await request.json();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
 
-    const updatedProduct = await Product.findByIdAndUpdate(params.id, data, {
+    const updatedProduct = await Product.findByIdAndUpdate(id, data, {
       new: true,
     });
     if (!updatedProduct) {
@@ -43,12 +44,12 @@ export async function PUT(
 
 // ✅ Delete product by ID
 export async function DELETE(
-  request: NextRequest,
-  params: { id: Promise<{ id: string }> } // Type params as a Promise
+  request: NextRequest
 ) {
   try {
     await connectDB();
-    const { id } = await params.id;
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
     const deletedProduct = await Product.findByIdAndDelete(id);
     if (!deletedProduct) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });

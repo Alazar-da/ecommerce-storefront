@@ -22,14 +22,15 @@ export async function GET(request: NextRequest) {
 
 // ✅ Update user by ID
 export async function PUT(
- request: NextRequest,
-  params: { id: Promise<{ id: string }> } // Type params as a Promise
+ request: NextRequest
 ) {
   try {
     await connectDB();
     const updateData = await request.json();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
 
-    const updatedUser = await User.findByIdAndUpdate(params.id, updateData, {
+    const updatedUser = await User.findByIdAndUpdate(id, updateData, {
       new: true,
     });
 
@@ -43,12 +44,12 @@ export async function PUT(
 
 // ✅ Delete user by ID
 export async function DELETE(
-  request: NextRequest,
-  params: { id: Promise<{ id: string }> } // Type params as a Promise
+  request: NextRequest
 ) {
   try {
     await connectDB();
-    const { id } = await params.id;
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
     const deletedUser = await User.findByIdAndDelete(id);
 
     if (!deletedUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
