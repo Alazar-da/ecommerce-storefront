@@ -1,31 +1,44 @@
 "use client";
+
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import ViewProduct from "../../components/ViewProduct";
 import { fetchProductById } from "@/utils/fetchProductById";
 import { Product } from "@/types/Product";
 
-
-
 const ProductPage: React.FC = () => {
-  const [product, setProduct] = useState<Product>();
   const searchParams = useSearchParams();
-  const productId = searchParams.get("id") ?? undefined;
-
-  console.log("Product ID from searchParams:", productId);
+  const productId = searchParams.get("id");
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!productId) return;
 
     const loadProduct = async () => {
-      const data = await fetchProductById(productId);
-      if (data) setProduct(data);
+      try {
+        const data = await fetchProductById(productId);
+        if (data) setProduct(data);
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadProduct();
   }, [productId]);
 
-  return product ? <ViewProduct product={product} /> : null;
+  if (loading) return <div className="p-6 text-center">Loading...</div>;
+
+  if (!product)
+    return <div className="p-6 text-center text-red-500">Product not found.</div>;
+
+  return (
+    <Suspense fallback={<div>Loading product details...</div>}>
+      <ViewProduct product={product} />
+    </Suspense>
+  );
 };
 
 export default ProductPage;

@@ -1,5 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { Elements } from "@stripe/react-stripe-js";
@@ -8,28 +10,28 @@ import CheckoutPage from "../../components/CheckoutPage";
 import convertToSubcurrency from "@/utils/convertToSubcurrency";
 import { Order } from "@/types/Order";
 import { formatPrice } from "@/utils/formatPrice";
-import { useSearchParams } from "next/navigation";
-
-useEffect(() => {
-  if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
-    toast.error("Stripe publishable key is not defined");
-  }
-}, []);
-
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-
-
-export default function OrderDetailPage() {
+// --- Inner Component that actually uses useSearchParams ---
+function OrderDetailContent() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id") ?? undefined;
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [clientSecret, setClientSecret] = useState("");
 
-  // Fetch order details
+  // ✅ Validate Stripe Key
   useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+      toast.error("Stripe publishable key is not defined");
+    }
+  }, []);
+
+  // ✅ Fetch order + payment intent
+  useEffect(() => {
+    if (!id) return;
+
     const fetchOrder = async () => {
       try {
         const res = await fetch(`/api/order/getorder?id=${id}`);
@@ -37,7 +39,6 @@ export default function OrderDetailPage() {
         const data = await res.json();
         setOrder(data);
 
-        // ✅ Create PaymentIntent only if not paid
         if (data.status !== "paid") {
           const paymentRes = await fetch("/api/create-payment-intent", {
             method: "POST",
@@ -49,7 +50,9 @@ export default function OrderDetailPage() {
           });
 
           const paymentData = await paymentRes.json();
-          if (paymentData.clientSecret) setClientSecret(paymentData.clientSecret);
+          if (paymentData.clientSecret) {
+            setClientSecret(paymentData.clientSecret);
+          }
         }
       } catch (error: any) {
         toast.error(error.message);
@@ -58,18 +61,18 @@ export default function OrderDetailPage() {
       }
     };
 
-    if (id) fetchOrder();
+    fetchOrder();
   }, [id]);
 
-  console.log("order:", order);
-  if (loading)
+  if (loading) {
     return (
       <section className="min-h-screen flex items-center justify-center bg-gray-50">
         <p className="text-gray-600 animate-pulse">Loading order details...</p>
       </section>
     );
+  }
 
-  if (!order)
+  if (!order) {
     return (
       <div className="w-full h-screen flex flex-col items-center justify-center bg-gray-50">
         <p className="text-gray-600">Order not found.</p>
@@ -78,11 +81,13 @@ export default function OrderDetailPage() {
         </Link>
       </div>
     );
+  }
 
   return (
-   <section className="min-h-screen bg-gray-50 py-8 text-slate-800">
+    <section className="min-h-screen bg-gray-50 py-8 text-slate-800">
       <div className="container mx-auto px-4 max-w-5xl">
-         <nav className="flex mb-6" aria-label="Breadcrumb">
+        {/* Breadcrumb */}
+        <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2 text-sm">
             <li>
               <Link href="/" className="text-gray-500 hover:text-gray-700">
@@ -98,18 +103,17 @@ export default function OrderDetailPage() {
             <li className="flex items-center">
               <span className="text-gray-400 mx-2">/</span>
               <span className="text-gray-900 font-medium capitalize">
-                {`#${order._id.slice(-6)}`}
+                #{order._id.slice(-6)}
               </span>
             </li>
           </ol>
         </nav>
+
         <h1 className="text-2xl font-bold mb-6">Order Details</h1>
 
         {/* Order Summary */}
         <div className="p-6 border rounded-xl bg-slate-200 shadow-sm mb-8">
-          <p className="text-gray-700 font-medium">
-            Order #{order._id.slice(-6)}
-          </p>
+          <p className="text-gray-700 font-medium">Order #{order._id.slice(-6)}</p>
           <p className="text-sm text-gray-500">
             Placed on{" "}
             {new Date(order.createdAt).toLocaleDateString("en-US", {
@@ -146,13 +150,11 @@ export default function OrderDetailPage() {
                 className="flex items-center justify-between p-4 border rounded-lg bg-gray-50"
               >
                 <div className="flex items-center space-x-4">
-           
-                    <img
-                      src={item.productId?.imageUrl}
-                      alt={item.productId?.name}
-                      className="w-14 h-14 object-cover rounded"
-                    />
-                 
+                  <img
+                    src={item.productId?.imageUrl}
+                    alt={item.productId?.name}
+                    className="w-14 h-14 object-cover rounded"
+                  />
                   <div>
                     <p className="font-medium">{item.productId?.name}</p>
                     <p className="text-sm text-gray-600">
@@ -161,7 +163,10 @@ export default function OrderDetailPage() {
                   </div>
                 </div>
                 <p className="font-semibold text-gray-800">
-                  {formatPrice(item.price * item.quantity,item.productId?.currency)}
+                  {formatPrice(
+                    item.price * item.quantity,
+                    item.productId?.currency
+                  )}
                 </p>
               </div>
             ))}
@@ -196,5 +201,14 @@ export default function OrderDetailPage() {
         </Link>
       </div>
     </section>
+  );
+}
+
+// --- Outer wrapper to use Suspense safely ---
+export default function OrderDetailPageWrapper() {
+  return (
+    <Suspense fallback={<div className="p-8 text-gray-600">Loading order...</div>}>
+      <OrderDetailContent />
+    </Suspense>
   );
 }
