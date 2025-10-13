@@ -66,7 +66,7 @@ export default function AdminOrderDetails() {
     }
   };
 
-  const refund = async () => {
+ /*  const refund = async () => {
     if (!confirm("Refund this order?")) return;
     try {
       const res = await fetch(`/api/admin/orders/refund?id=${id}`, { method: "POST" });
@@ -79,7 +79,7 @@ export default function AdminOrderDetails() {
     } catch (err: any) {
       toast.error(err.message || "Refund failed");
     }
-  };
+  }; */
 
   if (loading) return <div className="p-6">Loading...</div>;
   if (!order) return <div className="p-6">Order not found</div>;
@@ -95,7 +95,7 @@ export default function AdminOrderDetails() {
         </div>
         <div className="flex gap-2">
           <button onClick={() => updateOrder({ status: "shipped" })} className="px-3 py-2 bg-blue-600 text-white rounded">Mark Shipped</button>
-          <button onClick={refund} className="px-3 py-2 bg-red-600 text-white rounded">Refund</button>
+          <button onClick={() => deleteOrder(order._id)} className="px-3 py-2 bg-red-600 text-white rounded">Delete</button>
         </div>
       </div>
 
