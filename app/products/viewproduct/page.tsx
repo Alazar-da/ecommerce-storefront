@@ -6,7 +6,7 @@ import ViewProduct from "../../components/ViewProduct";
 import { fetchProductById } from "@/utils/fetchProductById";
 import { Product } from "@/types/Product";
 
-const ProductPage: React.FC = () => {
+function ProductPageContent() {
   const searchParams = useSearchParams();
   const productId = searchParams.get("id");
   const [product, setProduct] = useState<Product | null>(null);
@@ -34,11 +34,13 @@ const ProductPage: React.FC = () => {
   if (!product)
     return <div className="p-6 text-center text-red-500">Product not found.</div>;
 
+  return <ViewProduct product={product} />;
+}
+
+export default function ProductPage() {
   return (
-    <Suspense fallback={<div>Loading product details...</div>}>
-      <ViewProduct product={product} />
+    <Suspense fallback={<div className="text-center mt-20">Loading product details...</div>}>
+      <ProductPageContent />
     </Suspense>
   );
-};
-
-export default ProductPage;
+}
