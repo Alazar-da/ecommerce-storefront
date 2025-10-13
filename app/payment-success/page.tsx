@@ -1,11 +1,11 @@
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
-type PaymentSuccessProps = {
-  searchParams?: Record<string, string | string[] | undefined>;
-};
 
-export default function PaymentSuccess({ searchParams }: PaymentSuccessProps) {
-  const amount = searchParams?.amount as string | undefined;
+
+export default function PaymentSuccess() {
+  const params = useParams() as { amount: string };
+  const amount = params.amount  || "0.00";
   return (
     <section className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center w-full">
        <nav className="flex absolute top-5 left-15 z-10" aria-label="Breadcrumb">
