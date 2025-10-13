@@ -1,10 +1,10 @@
 'use client";'
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export default function PaymentSuccess() {
-  const params = useParams() as { amount: string };
-  const amount = params.amount  || "0.00";
+  const searchParams = useSearchParams();
+  const amount = searchParams.get("amount") || "0.00";
   return (
     <section className="min-h-screen relative bg-gray-50 flex flex-col items-center justify-center w-full">
        <nav className="flex absolute top-5 left-15 z-10" aria-label="Breadcrumb">
