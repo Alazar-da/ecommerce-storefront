@@ -199,7 +199,7 @@ const ProductPage = () => {
             <section className="w-full p-5 pb-0 mb-0">
             
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Product Management</h1>
+        <h1 className="text-2xl font-bold">Product Management</h1>
         <div className="flex items-center space-x-4 mt-4 md:mt-0">
           {/* View mode toggle */}
           <div className="flex bg-gray-100 rounded-lg p-1">
@@ -234,7 +234,7 @@ const ProductPage = () => {
             <input
               type="text"
               placeholder="Search products..."
-              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />

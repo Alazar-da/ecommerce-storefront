@@ -17,7 +17,6 @@ const Sidebar = ({ activePage, setActivePage }: {
     { id: 'dashboard', label: 'Dashboard',path:"/", icon: <FiHome className="text-lg" /> },
     { id: 'products', label: 'Products', path:"/products", icon: <FiBox className="text-lg" /> },
     { id: 'orders', label: 'Orders', path:"/orders", icon: <FiShoppingCart className="text-lg" /> },
-    { id: 'customers', label: 'Customers', path:"/customers", icon: <FiUsers className="text-lg" /> },
     { id: 'analytics', label: 'Analytics', path:"/analytics", icon: <FiPieChart className="text-lg" /> },
     { id: 'settings', label: 'Settings', path:"/settings", icon: <FiSettings className="text-lg" /> },
   ];

@@ -3,17 +3,9 @@ import { NextResponse } from "next/server";
 import connectDB from "@/DB/connectDB";
 import Order from "@/models/Order";
 
-function requireAdmin(req: Request) {
-  // TODO: replace with your admin auth logic (e.g., check cookie/session, JWT)
-  // const token = req.headers.get('authorization');
-  // verify token ...
-  // throw if not admin
-  return; // placeholder
-}
-
 export async function GET(req: Request) {
   try {
-/*     requireAdmin(req); */
+    /*     requireAdmin(req); */
 
     await connectDB();
     const url = new URL(req.url);
@@ -35,7 +27,19 @@ export async function GET(req: Request) {
     }
 
     const [orders, total] = await Promise.all([
-      Order.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      Order.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate({
+          path: "userId",
+          model: "User",
+        })
+        .populate({
+          path: "items.productId",
+          model: "Product",
+        })
+        .lean(),
       Order.countDocuments(query),
     ]);
 
