@@ -7,6 +7,7 @@ import { Category } from '@/types/Category';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import ProductCard from '../components/ProductCard';
+import { FiChevronDown, FiFilter, FiSearch, FiTag, FiX } from 'react-icons/fi';
 
 function ProductsPageContent() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -37,50 +38,55 @@ function ProductsPageContent() {
 // ✅ Fetch products whenever categoryId, sort, or search changes
 useEffect(() => {
   const savedCategory = localStorage.getItem('selectedCategory');
-  let effectiveCategoryId = categoryId;
+  const parsed = savedCategory ? JSON.parse(savedCategory) : null;
 
-  if (savedCategory) {
-    try {
-      const parsed = JSON.parse(savedCategory);
-      if (parsed?._id && parsed._id !== categoryId) {
-        effectiveCategoryId = parsed._id;
-        setCategoryId(parsed._id);
-      }
-    } catch (err) {
-      console.error("Invalid category in localStorage:", err);
-      localStorage.removeItem('selectedCategory');
-    }
-  }
+  // Use saved category if exists, otherwise use current categoryId
+  const activeCategoryId = parsed?._id || categoryId;
 
-  fetchProducts(effectiveCategoryId, sortBy, searchQuery);
-}, [sortBy, searchQuery]); // 🔥 no categoryId here — prevents loops
-
+  // If "All Categories" is selected (empty string), fetch all products
+  fetchProducts(activeCategoryId || '', sortBy, searchQuery);
+  setCategoryId(activeCategoryId || '');
+}, [categoryId, sortBy, searchQuery]);
 
 
 // ✅ Fetch products API call
-const fetchProducts = async (categoryId: string, sortBy: string, searchQuery: string) => {
+const fetchProducts = async (id: string, sort: string, search: string) => {
   try {
-    let url = `/api/products?sort=${sortBy}`;
-    if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
-    if (categoryId && categoryId !== "all") url += `&category=${categoryId}`;
+    setLoading(true);
+    setError(null);
 
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("Failed to fetch products");
-    const data = await res.json();
+    const params = new URLSearchParams();
 
-    if (!data.products || data.products.length === 0) {
-      toast.info("No products found");
+    // ✅ only append id if it's NOT empty
+    if (id && id.trim() !== '') params.append('id', id);
+    if (sort) params.append('sort', sort);
+    if (search) params.append('search', search);
+
+    const query = params.toString() ? `?${params.toString()}` : '';
+    console.log('Fetching products with params:', query);
+
+    const response = await fetch(`/api/category/getProductByCategoryId${query}`, {
+      cache: 'no-store',
+    });
+    const data = await response.json();
+
+    // ✅ If no products and a specific category was chosen, show info
+    if (response.status === 404 || (Array.isArray(data.products) && data.products.length === 0)) {
       setProducts([]);
+      if (id) toast.info('No products found for this category.');
       return;
     }
 
-    setProducts(data.products);
-  } catch (error) {
-    console.error("Fetch error:", error);
-    toast.error("Something went wrong while fetching products");
+    // ✅ Otherwise, show products
+    setProducts(data.products || data);
+  } catch (err: any) {
+    console.error('Error fetching products:', err);
+    setError(err.message);
+    toast.error('Failed to load products');
+  } finally {
+    setLoading(false);
   }
 };
-
 
 
   // ✅ Filter + sort frontend fallback
@@ -214,51 +220,96 @@ const handleCategoryChange = (value: string) => {
           </div>
 
           {/* Search + Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-            {/* Search */}
-            <div className="relative flex-1 sm:min-w-[280px]">
-              <input
-                type="text"
-                placeholder="Search products by name..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
-                className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-colors"
-              />
-            </div>
+            <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+              {/* Search */}
+              <div className="relative flex-1 sm:min-w-[280px]">
+                {/* Left icon (search) */}
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiSearch className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </span>
 
-            {/* Category Filter */}
-            <div className="relative flex-1 min-w-[160px]">
-              <select
-                name="categoryId"
-                value={categoryId}
-                onChange={(e) => handleCategoryChange(e.target.value)}
-                className="block w-full pl-3 pr-10 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white appearance-none transition-colors"
-              >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
+                <input
+                  type="text"
+                  placeholder="Search products by name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault(); // onKeyPress deprecated — handle Enter here
+                      // searchQuery state already updates; effect will fetch results
+                    }
+                  }}
+                  className="block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-colors"
+                  aria-label="Search products"
+                />
+
+                {/* Right icon (clear) */}
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 hover:text-gray-700"
+                    aria-label="Clear search"
+                  >
+                    <FiX className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+
+                {/* Category Filter */}
+                <div className="relative flex-1 min-w-[160px]">
+                {/* Left icon (tag) */}
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiTag className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </span>
+
+                <select
+                  name="categoryId"
+                  value={categoryId}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
+                  className="block w-full pl-10 pr-10 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white appearance-none transition-colors"
+                  aria-label="Filter by category"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((cat) => (
                   <option key={cat._id} value={cat._id}>
                     {cat.name}
                   </option>
-                ))}
-              </select>
-            </div>
+                  ))}
+                </select>
 
-            {/* Sort Filter */}
-            <div className="relative flex-1 min-w-[160px]">
-              <select
-                id="sort"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="block w-full pl-3 pr-10 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white appearance-none transition-colors"
-              >
-                <option value="name">Name A-Z</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest First</option>
-              </select>
+                {/* Right icon (chevron) */}
+                <span className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <FiChevronDown className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                </span>
+                </div>
+
+                {/* Sort Filter */}
+                <div className="relative flex-1 min-w-[160px]">
+                {/* Left icon (filter) */}
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiFilter className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </span>
+
+                <select
+                  id="sort"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="block w-full pl-10 pr-10 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white appearance-none transition-colors"
+                  aria-label="Sort products"
+                >
+                  <option value="name">Name A-Z</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="newest">Newest First</option>
+                </select>
+
+                {/* Right icon (chevron) */}
+                <span className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <FiChevronDown className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                </span>
+                </div>
             </div>
-          </div>
         </div>
 
         {/* Product Grid */}

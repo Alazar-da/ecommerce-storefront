@@ -341,17 +341,43 @@ const Header = () => {
           </div>
 
           {/* Mobile Search */}
-          <div className="mt-4 md:hidden">
-            <div className="relative">
+          <div className="mt-4 md:hidden flex flex-1 w-full relative">
+            <div className="relative w-full">
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search for products..."
                 className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                 value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
               />
             </div>
+
+             {isFocused && results.length > 0 && (
+        <div className="absolute top-14 left-0 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-80 overflow-y-auto">
+          {results.map((product) => (
+            <div
+              key={product._id}
+              onClick={() => handleProductView(product)}
+              className="flex justify-between px-4 py-2 hover:bg-emerald-50 transition-colors w-full hover:cursor-pointer"
+            >
+              <div className="flex flex-col items-center">
+                <p className="font-medium text-sm text-gray-800">
+                  {product.name}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {product.categoryId?.name || "Uncategorized"}
+                </p>
+              </div>
+              <span className="flex items-center text-sm font-semibold text-emerald-600">
+                {formatPrice(product.price, product.currency)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
           </div>
 
           {/* Mobile Navigation */}
@@ -386,14 +412,6 @@ const Header = () => {
                 >
                   Categories
                 </Link>
-               {/*  <Link 
-                  href="#" 
-                  className="flex items-center px-4 py-3 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 font-medium"
-                  onClick={handleMobileLinkClick}
-                >
-                  Deals
-                </Link> */}
-               
               </nav>
 
               {/* Mobile user section */}

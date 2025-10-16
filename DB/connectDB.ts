@@ -1,34 +1,38 @@
-import mongoose, { ConnectOptions } from 'mongoose';
-interface connectedOptions extends ConnectOptions{
-    useNewUrlParser: boolean,
-    useUnifiedTopology: boolean,
-}       
-const options: connectedOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-};
-let isConnected = false;
+import mongoose from "mongoose";
 
-// connecting to database
-const connectDB = async () => {
-     if (isConnected) return;
-    try {
-        await mongoose.connect(`mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPASS}@cluster0.bta9ljk.mongodb.net/${process.env.MONGODB}?retryWrites=true&w=majority`)
-          isConnected = true;
-   console.log("✅ MongoDB Connected:", mongoose.connection.host);
-      
-        
-    } catch (error) {
+const MONGODB_URI = `mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPASS}@cluster0.bta9ljk.mongodb.net/${process.env.MONGODB}?retryWrites=true&w=majority`;
 
-           console.error("❌ MongoDB Connection Error:", error);
-    throw error;
+if (!MONGODB_URI) {
+  throw new Error("❌ MONGODB_URI environment variable is not defined.");
+}
 
-    }
-};
+// Maintain a global cached connection (so Vercel doesn't reconnect each time)
+let cached = (global as any).mongoose;
 
+if (!cached) {
+  cached = (global as any).mongoose = { conn: null, promise: null };
+}
 
+export default async function connectDB() {
+  // Return cached connection if it exists
+  if (cached.conn) {
+    return cached.conn;
+  }
 
+  // Otherwise, create a new connection
+  if (!cached.promise) {
+    cached.promise = mongoose
+      .connect(MONGODB_URI)
+      .then((mongoose) => {
+        console.log("✅ MongoDB Connected:", mongoose.connection.host);
+        return mongoose;
+      })
+      .catch((err) => {
+        console.error("❌ MongoDB connection failed:", err);
+        throw err;
+      });
+  }
 
-
-
-export default connectDB;   
+  cached.conn = await cached.promise;
+  return cached.conn;
+} 
