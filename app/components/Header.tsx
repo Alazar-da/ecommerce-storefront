@@ -39,6 +39,10 @@ const Header = () => {
   useEffect(() => {
     const fetchCartCount = async () => {
       try {
+        if (!user?.id) {
+          setCartCount(0);
+          return;
+        }
         const res = await fetch(`/api/cart/count?id=${user.id}`);
         const data = await res.json();
         setCartCount(data.count);
