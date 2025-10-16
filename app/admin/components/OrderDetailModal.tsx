@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FiPackage, FiUser } from "react-icons/fi";
 import { Order } from "@/types/Order";
 import { formatPrice } from "@/utils/formatPrice";
+import { shortDate } from "@/utils/date";
 
 // Order Detail Modal Component
 const OrderDetailModal = ({ order, isOpen, onClose, loadingAction, onStatusUpdate }: { 
@@ -64,11 +65,11 @@ const OrderDetailModal = ({ order, isOpen, onClose, loadingAction, onStatusUpdat
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Date:</span>
-                  <span className="font-medium">{new Date(order.createdAt).toLocaleString()}</span>
+                  <span className="font-medium">{shortDate(order.createdAt)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Last Updated:</span>
-                  <span className="font-medium">{new Date(order.updatedAt).toLocaleString()}</span>
+                  <span className="font-medium">{shortDate(order.updatedAt)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Payment Method:</span>
@@ -207,8 +208,8 @@ const OrderDetailModal = ({ order, isOpen, onClose, loadingAction, onStatusUpdat
             <div className="space-y-2">
               <h4 className="font-semibold text-gray-900">Order Status History</h4>
               <div className="text-sm text-gray-600">
-                <div>Created: {new Date(order.createdAt).toLocaleString()}</div>
-                <div>Last Updated: {new Date(order.updatedAt).toLocaleString()}</div>
+                <div>Created: {shortDate(order.createdAt)}</div>
+                <div>Last Updated: {shortDate(order.updatedAt)}</div>
               </div>
             </div>
             <div className="space-y-2">

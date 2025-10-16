@@ -10,6 +10,7 @@ import CheckoutPage from "../../components/CheckoutPage";
 import convertToSubcurrency from "@/utils/convertToSubcurrency";
 import { Order } from "@/types/Order";
 import { formatPrice } from "@/utils/formatPrice";
+import { shortDate } from "@/utils/date";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -116,11 +117,7 @@ function OrderDetailContent() {
           <p className="text-gray-700 font-medium">Order #{order._id.slice(-6)}</p>
           <p className="text-sm text-gray-500">
             Placed on{" "}
-            {new Date(order.createdAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
+            {shortDate(order.createdAt)}
           </p>
           <div className="mt-3">
             <span
@@ -129,6 +126,14 @@ function OrderDetailContent() {
                   ? "bg-yellow-100 text-yellow-800"
                   : order.status === "paid"
                   ? "bg-green-100 text-green-800"
+                  : order.status === "shipped"
+                  ? "bg-blue-100 text-blue-800"
+                  : order.status === "completed"
+                  ? "bg-emerald-100 text-emerald-800"
+                  : order.status === "cancelled"
+                  ? "bg-red-100 text-red-800"
+                  : order.status === "refunded"
+                  ? "bg-gray-300 text-gray-800"
                   : "bg-gray-200 text-gray-700"
               }`}
             >

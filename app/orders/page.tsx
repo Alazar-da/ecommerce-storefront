@@ -4,6 +4,7 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import { formatPrice } from "@/utils/formatPrice";
 import { Order } from "@/types/Order";
+import { shortDate } from "@/utils/date";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -86,11 +87,7 @@ export default function OrdersPage() {
                 </p>
                 <p className="text-sm text-gray-600">
                   Date:{" "}
-                  {new Date(order.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  {shortDate(order.createdAt)}
                 </p>
                 <span
                   className={`inline-block mt-2 px-2 py-1 text-xs font-medium rounded-full ${

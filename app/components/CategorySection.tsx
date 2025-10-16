@@ -39,7 +39,8 @@ function CategorySection() {
 
   const handleCategory = (category:Category) => {
     if (user) {
-      route.push(`/products?category=${category._id}`);
+      localStorage.setItem("selectedCategory", JSON.stringify(category));
+      route.push("/products");
     } else {
       toast.info('Please log in to view this category');
     }
@@ -91,7 +92,6 @@ function CategorySection() {
             <a 
               key={category._id} 
               onClick={()=>handleCategory(category)}
-             /*  href={`/products?category=${category.name}`} */
               className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-500 hover:scale-105 transform hover:cursor-pointer"
             >
               <div className="bg-gray-200 rounded-full h-24 w-24 mx-auto mb-4 overflow-hidden">
@@ -99,13 +99,10 @@ function CategorySection() {
                   src={category.image} 
                   alt={category.name} 
                   className="h-full w-full object-cover"
-                 /*  onError={(e) => {
-                    e.target.src = '/images/placeholder-category.jpg';
-                  }} */
                 />
               </div>
               <h3 className="font-semibold mb-1 text-gray-800">{category.name}</h3>
-            {/*   <p className="text-gray-600 text-sm">{category.count} items</p> */}
+              <p className="text-sm text-gray-600">{category.description}</p>
             </a>
           ))}
         </div>

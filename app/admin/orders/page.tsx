@@ -8,6 +8,7 @@ import { Order } from "@/types/Order";
 import { FiGrid, FiList, FiSearch, FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiEye, FiTrash2, FiUser, FiMail, FiPhone, FiPackage, FiCreditCard, FiCalendar } from "react-icons/fi";
 import OrderDetailModal from "../components/OrderDetailModal";
 import { formatPrice } from "@/utils/formatPrice";
+import { shortDate } from "@/utils/date";
 
 
 export default function AdminOrdersPage() {
@@ -219,7 +220,7 @@ export default function AdminOrdersPage() {
                           #{order._id.slice(-8)}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
-                          {new Date(order.createdAt).toLocaleString()}
+                          {shortDate(order.createdAt)}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -385,7 +386,7 @@ export default function AdminOrdersPage() {
                             Order #{order._id.slice(-8)}
                           </div>
                           <div className="text-xs text-gray-500 mt-1">
-                            {new Date(order.createdAt).toLocaleString()}
+                            {shortDate(order.createdAt)}
                           </div>
                         </div>
                         <div className="text-right">

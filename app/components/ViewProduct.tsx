@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import {Cart} from '@/types/Cart';
 import { useAuthStore } from '@/store/useAuthStore';
+import { shortDate } from '@/utils/date';
 
 
 interface ViewProductProps {
@@ -116,27 +117,9 @@ const ViewProduct: React.FC<ViewProductProps> = ({ product }) => {
             <img
               src={product?.imageUrl}
               alt={product?.name}
-              className="w-full h-96 object-cover"
+              className="w-full h-96 object-fill"
             />
           </div>
-          
-          {/* Image Thumbnails */}
-         {/*  <div className="grid grid-cols-4 gap-2">
-            <button
-              onClick={() => setSelectedImage(product?.imageUrl)}
-              className={`border-2 rounded-lg overflow-hidden ${
-                selectedImage === product?.imageUrl
-                  ? 'border-emerald-500'
-                  : 'border-gray-200'
-              }`}
-            >
-              <img
-                src={product?.imageUrl}
-                alt={product.name}
-                className="w-full h-20 object-cover"
-              />
-            </button>
-          </div> */}
         </div>
 
         {/* Product Details */}
@@ -175,9 +158,6 @@ const ViewProduct: React.FC<ViewProductProps> = ({ product }) => {
             <span className="text-4xl font-bold text-emerald-600">
               {formatPrice(product?.price, product?.currency)}
             </span>
-            {product?.currency === 'USD' && (
-              <span className="text-lg text-gray-500">USD</span>
-            )}
           </div>
 
           {/* Description */}
@@ -260,7 +240,7 @@ const ViewProduct: React.FC<ViewProductProps> = ({ product }) => {
               <div>
                 <span className="font-semibold text-gray-600">Created:</span>
                 <span className="ml-2 text-gray-900">
-                  {new Date(product?.createdAt).toLocaleDateString()}
+                  {shortDate(product?.createdAt)}
                 </span>
               </div>
             </div>

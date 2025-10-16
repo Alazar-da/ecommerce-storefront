@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Product } from '@/types/Product';
 import { Category } from '@/types/Category';
 import { toast } from 'react-toastify';
@@ -10,64 +10,96 @@ import ProductCard from '../components/ProductCard';
 
 function ProductsPageContent() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('name');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [categoryId, setCategoryId] = useState<string>('');
+  const router = useRouter();
 
-  const searchParams = useSearchParams();
-  const categoryId = searchParams.get('category');
 
+
+  // ✅ Fetch categories
   useEffect(() => {
-    if (categoryId) {
-      fetchProducts(categoryId);
-      console.log('Fetching products for category ID:', categoryId);
-    } else {
-      setError('No category specified');
-      setLoading(false);
-    }
-  }, [categoryId]);
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/category/getCategories');
+        const data = await res.json();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+// ✅ Fetch products whenever categoryId, sort, or search changes
+useEffect(() => {
+  const savedCategory = localStorage.getItem('selectedCategory');
+  const parsed = savedCategory ? JSON.parse(savedCategory) : null;
 
+  // Use saved category if exists, otherwise use current categoryId
+  const activeCategoryId = parsed?._id || categoryId;
+
+  // If "All Categories" is selected (empty string), fetch all products
+  fetchProducts(activeCategoryId || '', sortBy, searchQuery);
+  setCategoryId(activeCategoryId || '');
+}, [categoryId, sortBy, searchQuery]);
+
+
+// ✅ Fetch products API call
+const fetchProducts = async (id: string, sort: string, search: string) => {
+  try {
+    setLoading(true);
+    setError(null);
+
+    const params = new URLSearchParams();
+
+    // ✅ only append id if it's NOT empty
+    if (id && id.trim() !== '') params.append('id', id);
+    if (sort) params.append('sort', sort);
+    if (search) params.append('search', search);
+
+    const query = params.toString() ? `?${params.toString()}` : '';
+    console.log('Fetching products with params:', query);
+
+    const response = await fetch(`/api/category/getProductByCategoryId${query}`, {
+      cache: 'no-store',
+    });
+    const data = await response.json();
+
+    // ✅ If no products and a specific category was chosen, show info
+    if (response.status === 404 || (Array.isArray(data.products) && data.products.length === 0)) {
+      setProducts([]);
+      if (id) toast.info('No products found for this category.');
+      return;
+    }
+
+    // ✅ Otherwise, show products
+    setProducts(data.products || data);
+  } catch (err: any) {
+    console.error('Error fetching products:', err);
+    setError(err.message);
+    toast.error('Failed to load products');
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  // ✅ Filter + sort frontend fallback
   useEffect(() => {
-    filterAndSortProducts();
-  }, [products, sortBy, searchQuery]);
-
-  const fetchProducts = async (id: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(`/api/category/getProductByCategoryId?id=${id}`);
-      if (!response.ok) throw new Error('Failed to fetch products');
-
-      const productsData = await response.json();
-      setProducts(productsData);
-    } catch (err: any) {
-      setError(err.message);
-      console.error('Error fetching products:', err);
-      toast.error('Failed to load products');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-  };
-
-  const filterAndSortProducts = () => {
     let filtered = [...products];
 
-    // Search filter
     if (searchQuery) {
-      filtered = filtered.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter(
+        (p) =>
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Sorting
     switch (sortBy) {
       case 'name':
         filtered.sort((a, b) => a.name.localeCompare(b.name));
@@ -80,38 +112,44 @@ function ProductsPageContent() {
         break;
       case 'newest':
         filtered.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
-        break;
-      default:
         break;
     }
 
     setFilteredProducts(filtered);
-  };
+  }, [products, sortBy, searchQuery]);
+
+  // ✅ When category changes — update state + localStorage + URL
+const handleCategoryChange = (value: string) => {
+  setCategoryId(value);
+
+  if (value) {
+    const selected = categories.find((cat) => cat._id === value);
+    if (selected) localStorage.setItem('selectedCategory', JSON.stringify(selected));
+  } else {
+    // ✅ Clear saved category when "All Categories" selected
+    localStorage.removeItem('selectedCategory');
+  }
+
+  const params = new URLSearchParams();
+  if (value) params.set('id', value);
+  if (sortBy) params.set('sort', sortBy);
+  if (searchQuery) params.set('search', searchQuery);
+  router.push(`/products?${params.toString()}`);
+};
+
+
+  const handleSearch = (e: React.FormEvent) => e.preventDefault();
 
   const categoryName =
-    products.length > 0 && products[0].categoryId
-      ? (products[0].categoryId as Category).name
-      : 'Products';
+    categories.find((c) => c._id === categoryId)?.name || 'All Products';
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/4 mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-md p-4">
-                  <div className="bg-gray-300 h-48 rounded-md mb-4"></div>
-                  <div className="bg-gray-300 h-4 rounded mb-2"></div>
-                  <div className="bg-gray-200 h-4 rounded w-3/4"></div>
-                </div>
-              ))}
-            </div>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-center">
+        <div className="text-gray-500 text-lg animate-pulse">
+          Loading products...
         </div>
       </div>
     );
@@ -119,19 +157,17 @@ function ProductsPageContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">
-            Error Loading Products
-          </h1>
-          <p className="text-red-600 mb-4">{error}</p>
-          <button
-            onClick={() => categoryId && fetchProducts(categoryId)}
-            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center text-center bg-gray-50">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          Error Loading Products
+        </h1>
+        <p className="text-red-600 mb-4">{error}</p>
+        <button
+          onClick={() => fetchProducts(categoryId, sortBy, searchQuery)}
+          className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -163,52 +199,68 @@ function ProductsPageContent() {
         </nav>
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 capitalize mb-2">
-              {categoryName}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 capitalize mb-2">
+              {categoryId ? categoryName : 'All Products'}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-sm sm:text-base">
               {filteredProducts.length} product
               {filteredProducts.length !== 1 ? 's' : ''} found
+              {searchQuery && (
+                <span className="text-emerald-600 ml-2">
+                  for "{searchQuery}"
+                </span>
+              )}
+              {categoryId && categoryName && (
+                <span className="text-emerald-600 ml-2">in {categoryName}</span>
+              )}
             </p>
           </div>
 
-          {/* Search & Sort */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-4 md:mt-0">
-            <form onSubmit={handleSearch} className="flex">
+          {/* Search + Filters */}
+          <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+            {/* Search */}
+            <div className="relative flex-1 sm:min-w-[280px]">
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Search products by name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="border border-gray-300 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 w-48"
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
+                className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-colors"
               />
-              <button
-                type="submit"
-                className="bg-emerald-600 text-white px-4 py-2 rounded-r-md hover:bg-emerald-700 transition-colors text-sm"
-              >
-                Search
-              </button>
-            </form>
+            </div>
 
-            <div className="flex items-center space-x-2">
-              <label
-                htmlFor="sort"
-                className="text-sm font-medium text-gray-700 whitespace-nowrap"
+            {/* Category Filter */}
+            <div className="relative flex-1 min-w-[160px]">
+              <select
+                name="categoryId"
+                value={categoryId}
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                className="block w-full pl-3 pr-10 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white appearance-none transition-colors"
               >
-                Sort by:
-              </label>
+                <option value="">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Sort Filter */}
+            <div className="relative flex-1 min-w-[160px]">
               <select
                 id="sort"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="block w-full pl-3 pr-10 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white appearance-none transition-colors"
               >
-                <option value="name">Name</option>
+                <option value="name">Name A-Z</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest</option>
+                <option value="newest">Newest First</option>
               </select>
             </div>
           </div>
@@ -217,25 +269,10 @@ function ProductsPageContent() {
         {/* Product Grid */}
         {filteredProducts.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-gray-400 text-6xl mb-4">
-              {searchQuery ? '🔍' : '😔'}
-            </div>
+            <div className="text-gray-400 text-6xl mb-4">😔</div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              {searchQuery ? 'No Products Found' : 'No Products Available'}
+              No Products Found
             </h2>
-            <p className="text-gray-600 mb-6">
-              {searchQuery
-                ? `No products found for "${searchQuery}" in this category.`
-                : 'There are no products available in this category at the moment.'}
-            </p>
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors mr-4"
-              >
-                Clear Search
-              </button>
-            )}
             <Link
               href="/"
               className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
@@ -244,7 +281,7 @@ function ProductsPageContent() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
@@ -257,7 +294,7 @@ function ProductsPageContent() {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="text-center mt-20">Loading...</div>}>
+    <Suspense fallback={<div className="text-center mt-20 text-gray-500">Loading...</div>}>
       <ProductsPageContent />
     </Suspense>
   );

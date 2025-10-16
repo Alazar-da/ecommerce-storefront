@@ -24,35 +24,6 @@ export default function FeaturedProducts() {
     fetchFeatured();
   }, []);
 
-   // Render star ratings
-  const renderStars = (rating: number) => {
-    return (
-      <div className="flex items-center space-x-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <FiStar
-            key={star}
-            className={`w-4 h-4 ${
-              star <= rating
-                ? 'text-yellow-400 fill-current'
-                : 'text-gray-300'
-            }`}
-          />
-        ))}
-        <span className="text-sm text-gray-500 ml-1">({rating})</span>
-      </div>
-    );
-  };
-
-  const addToCart = (productId: string) => {
-    // Add to cart logic here
-    console.log('Added to cart:', productId);
-  };
-
-  const addToWishlist = (productId: string) => {
-    // Add to wishlist logic here
-    console.log('Added to wishlist:', productId);
-  };
-
   <div className="flex justify-center items-center py-12">
     <span className="animate-spin rounded-full h-8 w-8 border-t-4 border-emerald-500 border-solid mr-4"></span>
     <p className="text-emerald-600 text-lg font-semibold">Loading featured products...</p>
@@ -90,7 +61,7 @@ export default function FeaturedProducts() {
         {/* View All Button */}
         <div className="text-center mt-12">
           <Link
-            href="/products"
+            href="/products?sort=name"
             className="inline-flex items-center px-8 py-4 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-2xl hover:bg-emerald-600 hover:text-white transition-all duration-300 transform hover:scale-105"
           >
             View All Products

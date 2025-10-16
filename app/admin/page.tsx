@@ -6,6 +6,7 @@ import Sidebar from './components/sidebar';
 import { Order } from "@/types/Order";
 import { toast } from "react-toastify";
 import { formatPrice } from "@/utils/formatPrice";
+import { shortDate } from "@/utils/date";
 
 const DashboardHome = () => {
     const [activePage, setActivePage] = useState('dashboard');
@@ -251,13 +252,7 @@ const DashboardHome = () => {
                                                 <div className="text-xs text-gray-500">{order.userId.email}</div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {new Date(order.createdAt).toLocaleDateString('en-US', {
-                                                    year: 'numeric',
-                                                    month: 'short',
-                                                    day: 'numeric',
-                                                    hour: '2-digit',
-                                                    minute: '2-digit'
-                                                })}
+                                                {shortDate(order.createdAt)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                                                 {formatPrice(order.totalAmount, order.items[0]?.productId?.currency || 'ETB')}

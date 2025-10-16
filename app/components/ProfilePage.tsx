@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiArrowLeft, FiEye, FiEyeOff } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { User } from '@/types/User';
+import { shortDate } from '@/utils/date';
+import Link from 'next/link';
 
 interface PasswordForm {
     userId: string;
@@ -105,10 +107,11 @@ const handlePasswordChange = async (e: React.FormEvent) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-cyan-50 py-8 px-4 sm:px-6 lg:px-8 text-slate-800">
+    <div className="h-screen bg-gradient-to-br from-emerald-50 to-cyan-50 py-8 px-4 sm:px-6 lg:px-8 text-slate-800 w-full overflow-y-auto">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        {user?.role==='customer'&& <Link href={'/'}  className='bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center gap-1 hover:cursor-pointer w-fit'><FiArrowLeft /> Home</Link>}
+        <div className="text-center my-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Your Profile</h1>
           <p className="text-lg text-gray-600">Manage your account information and security</p>
         </div>
@@ -131,7 +134,7 @@ const handlePasswordChange = async (e: React.FormEvent) => {
           <div className="border-b border-gray-200 flex">
             <button
               onClick={() => setActiveTab('profile')}
-              className={`flex-1 py-4 text-center font-medium text-sm ${
+              className={`flex-1 py-4 text-center font-medium text-sm hover:cursor-pointer ${
                 activeTab === 'profile'
                   ? 'border-b-2 border-emerald-500 text-emerald-600'
                   : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -141,7 +144,7 @@ const handlePasswordChange = async (e: React.FormEvent) => {
             </button>
             <button
               onClick={() => setActiveTab('password')}
-              className={`flex-1 py-4 text-center font-medium text-sm ${
+              className={`flex-1 py-4 text-center font-medium text-sm hover:cursor-pointer ${
                 activeTab === 'password'
                   ? 'border-b-2 border-cyan-500 text-cyan-600'
                   : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -151,12 +154,12 @@ const handlePasswordChange = async (e: React.FormEvent) => {
             </button>
           </div>
 
-          <div className="p-6 sm:p-8">
+          <div className="p-6 sm:p-8 flex justify-center">
             {activeTab === 'profile' && user && (
-              <div className="space-y-6">
+              <div className="space-y-6 w-full">
                 <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                   <InfoCard label="Username" value={user.username} color="emerald" />
                   <InfoCard label="Email Address" value={user.email} color="cyan" />
                   <InfoCard
@@ -171,11 +174,7 @@ const handlePasswordChange = async (e: React.FormEvent) => {
                   />
                   <InfoCard
                     label="Member Since"
-                    value={new Date(user.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
+                    value={shortDate(user.createdAt)}
                     color="emerald"
                     full
                   />
@@ -188,7 +187,7 @@ const handlePasswordChange = async (e: React.FormEvent) => {
                   </p>
                   <button
                     onClick={() => setActiveTab('password')}
-                    className="mt-4 bg-white text-emerald-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                    className="mt-4 bg-white text-emerald-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors hover:cursor-pointer"
                   >
                     Change Password
                   </button>
@@ -197,34 +196,40 @@ const handlePasswordChange = async (e: React.FormEvent) => {
             )}
 
             {activeTab === 'password' && (
-              <div className="max-w-md">
+              <div className="max-w-lg w-full">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Change Password</h2>
 
-              <form onSubmit={handlePasswordChange} className="space-y-4">
-  <PasswordField
+              <form onSubmit={handlePasswordChange} className="space-y-4 flex flex-col w-full items-center">
+  <div className='w-full'>
+ <PasswordField
     id="currentPassword"
     label="Current Password"
     value={passwordForm.currentPassword}
     onChange={(val) => handlePasswordInputChange('currentPassword', val)}
   />
+  </div>
+ <div className="mt-4 w-full">
   <PasswordField
     id="newPassword"
     label="New Password"
     value={passwordForm.newPassword}
     onChange={(val) => handlePasswordInputChange('newPassword', val)}
   />
+  </div>
+  <div className="mt-4 w-full">
   <PasswordField
     id="confirmPassword"
     label="Confirm New Password"
     value={passwordForm.confirmPassword}
     onChange={(val) => handlePasswordInputChange('confirmPassword', val)}
   />
+  </div>
 
   <button
     type="submit"
     disabled={saving}
-    className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 px-4 rounded-lg font-semibold hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 shadow-lg"
-  >
+    className="w-full py-2 px-4 rounded-md text-white bg-emerald-600 hover:bg-emerald-700 hover:cursor-pointer"
+                          >
     {saving ? (
       <div className="flex items-center justify-center">
         <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin mr-2"></div>
@@ -291,8 +296,8 @@ const PasswordField = ({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors pr-10"
-        required
+        className='appearance-none block w-full pl-2 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm'
+       required
       />
       <button
         type="button"

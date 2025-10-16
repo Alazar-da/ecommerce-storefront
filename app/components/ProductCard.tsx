@@ -80,14 +80,14 @@ const handleAddToCart = async (product: Product) => {
     }
 
   return (
-    <section onClick={() => handleProductView(product)}>
+    <section onClick={() => handleProductView(product)} className='w-full h-full'>
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer group">
         {/* Product Image */}
         <div className="relative overflow-hidden">
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="w-full h-48 object-contain group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-48 object-fill group-hover:scale-105 transition-transform duration-300"
           />
           {product.featured && (
             <div className="absolute top-2 left-2">

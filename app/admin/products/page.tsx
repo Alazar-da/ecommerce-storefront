@@ -388,7 +388,7 @@ const ProductPage = () => {
                     <span className="text-xs text-gray-500">Added: {shortDate(product.createdAt)}</span>
                     <div className="flex space-x-2">
                       <button 
-                        className="text-emerald-600 hover:text-emerald-900 p-1 hover:cursor-pointer"
+                        className="text-blue-600 hover:text-blue-900 p-1 hover:cursor-pointer"
                         onClick={() => handleViewClick(product)}
                         aria-label="View product"
                       >
