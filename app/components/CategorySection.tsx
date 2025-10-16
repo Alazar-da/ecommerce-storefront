@@ -38,12 +38,10 @@ function CategorySection() {
   };
 
   const handleCategory = (category:Category) => {
-    if (user) {
+
       localStorage.setItem("selectedCategory", JSON.stringify(category));
       route.push("/products");
-    } else {
-      toast.info('Please log in to view this category');
-    }
+   
   }
   if (loading) {
     return (

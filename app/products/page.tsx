@@ -37,55 +37,50 @@ function ProductsPageContent() {
 // ✅ Fetch products whenever categoryId, sort, or search changes
 useEffect(() => {
   const savedCategory = localStorage.getItem('selectedCategory');
-  const parsed = savedCategory ? JSON.parse(savedCategory) : null;
+  let effectiveCategoryId = categoryId;
 
-  // Use saved category if exists, otherwise use current categoryId
-  const activeCategoryId = parsed?._id || categoryId;
+  if (savedCategory) {
+    try {
+      const parsed = JSON.parse(savedCategory);
+      if (parsed?._id && parsed._id !== categoryId) {
+        effectiveCategoryId = parsed._id;
+        setCategoryId(parsed._id);
+      }
+    } catch (err) {
+      console.error("Invalid category in localStorage:", err);
+      localStorage.removeItem('selectedCategory');
+    }
+  }
 
-  // If "All Categories" is selected (empty string), fetch all products
-  fetchProducts(activeCategoryId || '', sortBy, searchQuery);
-  setCategoryId(activeCategoryId || '');
-}, [categoryId, sortBy, searchQuery]);
+  fetchProducts(effectiveCategoryId, sortBy, searchQuery);
+}, [sortBy, searchQuery]); // 🔥 no categoryId here — prevents loops
+
 
 
 // ✅ Fetch products API call
-const fetchProducts = async (id: string, sort: string, search: string) => {
+const fetchProducts = async (categoryId: string, sortBy: string, searchQuery: string) => {
   try {
-    setLoading(true);
-    setError(null);
+    let url = `/api/products?sort=${sortBy}`;
+    if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
+    if (categoryId && categoryId !== "all") url += `&category=${categoryId}`;
 
-    const params = new URLSearchParams();
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Failed to fetch products");
+    const data = await res.json();
 
-    // ✅ only append id if it's NOT empty
-    if (id && id.trim() !== '') params.append('id', id);
-    if (sort) params.append('sort', sort);
-    if (search) params.append('search', search);
-
-    const query = params.toString() ? `?${params.toString()}` : '';
-    console.log('Fetching products with params:', query);
-
-    const response = await fetch(`/api/category/getProductByCategoryId${query}`, {
-      cache: 'no-store',
-    });
-    const data = await response.json();
-
-    // ✅ If no products and a specific category was chosen, show info
-    if (response.status === 404 || (Array.isArray(data.products) && data.products.length === 0)) {
+    if (!data.products || data.products.length === 0) {
+      toast.info("No products found");
       setProducts([]);
-      if (id) toast.info('No products found for this category.');
       return;
     }
 
-    // ✅ Otherwise, show products
-    setProducts(data.products || data);
-  } catch (err: any) {
-    console.error('Error fetching products:', err);
-    setError(err.message);
-    toast.error('Failed to load products');
-  } finally {
-    setLoading(false);
+    setProducts(data.products);
+  } catch (error) {
+    console.error("Fetch error:", error);
+    toast.error("Something went wrong while fetching products");
   }
 };
+
 
 
   // ✅ Filter + sort frontend fallback
