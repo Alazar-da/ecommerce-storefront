@@ -60,7 +60,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   const data = await res.json();
 
-  if (!data.success) return toast.error(data.error);
+  if (!data.success) 
+    return (
+      toast.error(data.error),
+      setIsLoading(false)
+    );
 
   // Save token to localStorage or cookie
   localStorage.setItem("token", data.token);
