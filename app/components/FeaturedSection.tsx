@@ -24,14 +24,37 @@ export default function FeaturedProducts() {
     fetchFeatured();
   }, []);
 
-  <div className="flex justify-center items-center py-12">
-    <span className="animate-spin rounded-full h-8 w-8 border-t-4 border-emerald-500 border-solid mr-4"></span>
-    <p className="text-emerald-600 text-lg font-semibold">Loading featured products...</p>
-  </div>
+  // Loading state
+  if (loading) {
+    return (
+      <section id="products" className="py-16 bg-gradient-to-b from-gray-50 to-white">
+        <div className="container mx-auto px-4">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium mb-4">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
+              Featured Collection
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Our Featured
+              <span className="block bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                Products
+              </span>
+            </h2>
+          </div>
+
+          {/* Loading Spinner */}
+          <div className="flex flex-col justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 mb-4"></div>
+            <p className="text-emerald-600 text-lg font-semibold">Loading featured products...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-
-    <section id="Products" className="py-16 bg-gradient-to-b from-gray-50 to-white">
+    <section id="products" className="py-16 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
@@ -52,11 +75,17 @@ export default function FeaturedProducts() {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {featured.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </div>
+        {featured.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {featured.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No featured products found.</p>
+          </div>
+        )}
 
         {/* View All Button */}
         <div className="text-center mt-12">
@@ -89,5 +118,4 @@ export default function FeaturedProducts() {
       `}</style>
     </section>
   );
-};
-
+}
