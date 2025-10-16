@@ -78,6 +78,7 @@ setUser(data.user);
   } catch (error) {
     console.error("Error fetching session:", error);
     toast.error("An unexpected error occurred");
+    setIsLoading(false);
   }
 };
 
