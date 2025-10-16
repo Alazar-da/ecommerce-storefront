@@ -1,30 +1,23 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = `mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPASS}@cluster0.bta9ljk.mongodb.net/${process.env.MONGODB}?retryWrites=true&w=majority`;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error("❌ MONGODB_URI environment variable is not defined.");
+  throw new Error("❌ MONGODB_URI is not defined in environment variables.");
 }
 
-// Maintain a global cached connection (so Vercel doesn't reconnect each time)
-let cached = (global as any).mongoose;
-
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
-}
+let cached = (global as any).mongoose || { conn: null, promise: null };
 
 export default async function connectDB() {
-  // Return cached connection if it exists
-  if (cached.conn) {
-    return cached.conn;
-  }
+  if (cached.conn) return cached.conn;
 
-  // Otherwise, create a new connection
   if (!cached.promise) {
     cached.promise = mongoose
-      .connect(MONGODB_URI)
+      .connect(MONGODB_URI!, {
+        dbName: "ecommerce_storefront",
+      })
       .then((mongoose) => {
-        console.log("✅ MongoDB Connected:", mongoose.connection.host);
+        console.log("✅ MongoDB connected:", mongoose.connection.host);
         return mongoose;
       })
       .catch((err) => {
@@ -34,5 +27,6 @@ export default async function connectDB() {
   }
 
   cached.conn = await cached.promise;
+  (global as any).mongoose = cached;
   return cached.conn;
-} 
+}
