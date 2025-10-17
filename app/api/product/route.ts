@@ -17,44 +17,71 @@ export async function POST(req: Request) {
   }
 }
 
-// ✅ Get all products with optional filters
+// ✅ Get products with search, filter, pagination
 export async function GET(req: Request) {
   try {
     await connectDB();
 
-    // Extract query params (categoryId & search)
-    const { searchParams } = new URL(req.url);
-    const categoryId = searchParams.get("id");
-    const search = searchParams.get("search");
+    const url = new URL(req.url);
+    const q = url.searchParams.get("q") || ""; // general search term
+    const categoryId = url.searchParams.get("categoryId") || "";
+    const page = Number(url.searchParams.get("page") || 1);
+    const limit = Number(url.searchParams.get("limit") || 10);
+    const skip = (page - 1) * limit;
 
     // Build query object
     const query: any = {};
-     // ✅ Only filter by category if it's not "all" and not empty
-    if (categoryId && categoryId !== "all") {
-      query.categoryId = categoryId;
-    }
-    if (search) {
+    if (categoryId && categoryId !== "all") query.categoryId = categoryId;
+    if (q) {
       query.$or = [
-        { name: { $regex: search, $options: "i" } }, // case-insensitive
-        { description: { $regex: search, $options: "i" } }
+        { name: { $regex: q, $options: "i" } },
+        { description: { $regex: q, $options: "i" } },
       ];
     }
 
-    // Fetch products
-    const products = await Product.find(query).populate("categoryId");
+    // Fetch products and total count in parallel
+    const [products, total] = await Promise.all([
+      Product.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("categoryId")
+        .lean(),
+      Product.countDocuments(query),
+    ]);
 
-    return NextResponse.json(products, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    // Respond with pagination info
+    return NextResponse.json(
+      {
+        products,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page * limit < total,
+        hasPrevPage: page > 1,
+      },
+      { status: 200 }
+    );
+  } catch (err: any) {
+    console.error("Products list error:", err);
+    return NextResponse.json(
+      { error: err.message || "Server error" },
+      { status: 500 }
+    );
   }
 }
+
+
 
 
 // ✅ Update product
 export async function PUT(req: Request) {
   try {
     await connectDB();
-    const { id, ...updateData } = await req.json();
+    const url = new URL(req.url);
+    const id = url.searchParams.get("id");
+    const { ...updateData } = await req.json();
 
     const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
       new: true,

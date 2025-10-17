@@ -133,11 +133,10 @@ export default function AdminOrdersPage() {
     <main className="flex min-h-screen bg-gray-100 w-full text-slate-800 pb-6 md:pb-0">
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
       
-      <section className="w-full p-5 pb-0 mb-0">          
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
-          <div className="flex items-center gap-3 mt-4 md:mt-0">
-            <span className="text-sm text-gray-600">View:</span>
+      <section className="w-full py-5 px-3 lg:px-5 mb-0">          
+        <div className="flex flex-row items-center justify-between mb-6 mt-6 lg:mt-0">
+          <h1 className="md:text-3xl text-2xl font-bold text-gray-900">Orders Management</h1>
+          <div className="flex items-center gap-3">
             <div className="flex bg-gray-100 rounded-lg p-1">
               <button
                 className={`p-2 rounded-md transition-colors ${viewMode === 'table' ? 'bg-white shadow text-emerald-600' : 'text-gray-500 hover:text-gray-700'}`}
@@ -200,8 +199,8 @@ export default function AdminOrdersPage() {
             </div>
           ) : viewMode === "table" ? (
             /* Table View */
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+           <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>

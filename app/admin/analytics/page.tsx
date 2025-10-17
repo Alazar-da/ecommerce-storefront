@@ -228,9 +228,9 @@ export default function AdminAnalyticsPage() {
   return (
     <main className="flex h-screen bg-gray-100 w-full text-slate-800">
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
-      <section className="p-8 overflow-y-auto h-screen w-full">
+      <section className="py-5 px-3 lg:px-5 mb-0 overflow-y-auto h-screen w-full">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6 mt-6 lg:mt-0">
           <div className="mb-4 lg:mb-0">
             <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
             <p className="text-gray-600 mt-2">Comprehensive insights and performance metrics</p>

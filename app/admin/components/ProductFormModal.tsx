@@ -152,7 +152,7 @@ export default function ProductFormModal({
 
       let res;
       if (initialData) {
-        res = await fetch(`/api/product/${initialData._id}`, {
+        res = await fetch(`/api/product?id=${initialData._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(productData),
@@ -169,7 +169,7 @@ export default function ProductFormModal({
         const savedProduct = await res.json();
         toast.success(initialData ? "Product updated successfully!" : "Product created successfully!");
         onSave(savedProduct);
-        setTimeout(() => window.location.reload(), 4500);
+        setTimeout(() => window.location.reload(), 4000);
       } else {
         const errorData = await res.json();
         toast.error(errorData.error || "Failed to save product");

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState,useEffect } from 'react';
-import {  FiGrid, FiList, FiEdit, FiTrash2, FiSearch, FiEye } from 'react-icons/fi';
+import {  FiGrid, FiList, FiEdit, FiTrash2, FiSearch, FiEye, FiChevronRight, FiChevronsRight, FiChevronLeft, FiChevronsLeft } from 'react-icons/fi';
 import DeletePopup from '../components/DeletePopup';
 import ViewPopup from '../components/ViewPopup';
 import Sidebar from '../components/sidebar';
@@ -13,12 +13,42 @@ import { formatPrice } from '@/utils/formatPrice';
 
 const ProductPage = () => {
   const [loading, setLoading] = useState(false);
-   const [activePage, setActivePage] = useState('products');
+  const [activePage, setActivePage] = useState('products');
   const [categories, setCategories] = useState<Category[]>([]);
-     const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState("all");
-    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const [total, setTotal] = useState(0);
+
+
+    const totalPages = Math.ceil(total / limit);
+  const startItem = (page - 1) * limit + 1;
+  const endItem = Math.min(page * limit, total);
+
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    if (totalPages <= 1) return [1];
+    
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    // Adjust if we're near the end
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  };
 
     // ✅ Fetch categories
   useEffect(() => {
@@ -34,28 +64,34 @@ const ProductPage = () => {
     fetchCategories();
   }, []);
 
-  // Fetch products with filters
-  const fetchProducts = async () => {
-    let url = "/api/product";
-   setLoading(true)
+// ✅ Fetch products with search, filter, pagination
+const fetchProducts = async () => {
+  try {
+    setLoading(true);
+
     const params = new URLSearchParams();
+    params.set("page", String(page));
+    params.set("limit", String(limit));
     if (categoryId) params.append("categoryId", categoryId);
-    if (search) params.append("search", search);
+    if (search) params.append("q", search); // ✅ updated key
 
-    if (params.toString()) {
-      url += `?${params.toString()}`;
-    }
-
+    const url = `/api/product?${params.toString()}`;
     const res = await fetch(url);
     const data = await res.json();
-    setProducts(data);
-    console.log("Fetched products:", data);
-    setLoading(false)
-  };
+
+    setProducts(data.products);
+    setTotal(data.total);
+    setLoading(false);
+  } catch (err) {
+    console.error("Error fetching products:", err);
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchProducts();
-  }, [search, categoryId]);
+  }, [search, categoryId, page, limit]);
 
 
   const [deletePopup, setDeletePopup] = useState({
@@ -68,18 +104,7 @@ const ProductPage = () => {
     product: null as Product | null
   });
 
-
-
-
    const [isOpen, setIsOpen] = useState(false);
-
-  const handleSave = (product: Product) => {
-    console.log("Saved product:", product);
-    // 👉 send product to your API / MongoDB here
-  };
-
-
-
 
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
 
@@ -96,12 +121,6 @@ const ProductPage = () => {
       isOpen: true,
       product
     });
-  };
-
-  // Function to handle add to cart
-  const handleAddToCart = (product: Product) => {
-    console.log('Adding to cart:', product);
-    // Your add to cart logic here
   };
 
     // Function to close the popup
@@ -143,6 +162,10 @@ const ProductPage = () => {
     setDeletePopup({ isOpen: false, id: null, name: '' });
   }
 };
+
+const handleSave = (product: Product) => {
+console.log('Product saved:', product);
+}
 
    // Function to handle cancellation
   const handleDeleteCancel = () => {
@@ -193,13 +216,12 @@ const ProductPage = () => {
           product={viewPopup.product}
           isOpen={viewPopup.isOpen}
           onClose={handleClosePopup}
-          onAddToCart={handleAddToCart}
         />
       )}
-            <section className="w-full p-5 pb-0 mb-0">
+            <section className="w-full py-5 px-3 lg:px-5 mb-0">
             
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Product Management</h1>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 mt-6 lg:mt-0">
+        <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
         <div className="flex items-center space-x-4 mt-4 md:mt-0">
           {/* View mode toggle */}
           <div className="flex bg-gray-100 rounded-lg p-1">
@@ -276,9 +298,9 @@ const ProductPage = () => {
     ) : (
       <>
         {viewMode === 'table' && (
-          <div className="table-auto md:table-fixed w-full md:w-[80vw] xl:w-full overflow-x-auto md:h-[70vh]">
+           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+                                <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
@@ -341,11 +363,114 @@ const ProductPage = () => {
             </table>
 
            
-           {/*  {products.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                No products found matching your criteria.
-              </div>
-            )} */}
+             {/* Pagination */}
+                     {products.length === 0 ? (
+                       <div className="text-center py-12">
+                         <div className="text-gray-400 text-lg mb-2">No products found</div>
+                         <div className="text-gray-500 text-sm">Try adjusting your search or filters</div>
+                       </div>
+                     ) : (
+                       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 border-t border-gray-200">
+                         {/* Results info */}
+                         <div className="text-sm text-gray-600">
+                           Showing <span className="font-semibold text-gray-900">{startItem}</span> -{' '}
+                           <span className="font-semibold text-gray-900">{endItem}</span> of{' '}
+                           <span className="font-semibold text-gray-900">{total.toLocaleString()}</span> products
+                         </div>
+       
+                         {/* Pagination controls */}
+                         <div className="flex items-center gap-1">
+                           <button
+                             onClick={() => setPage(1)}
+                             disabled={page === 1}
+                             className={`p-2 border rounded-lg transition-all duration-200 ${
+                               page === 1
+                                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-300'
+                                 : 'bg-white border-gray-300 text-gray-600 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-600'
+                             }`}
+                             aria-label="First page"
+                           >
+                             <FiChevronsLeft className="text-lg" />
+                           </button>
+       
+                           <button
+                             onClick={() => setPage(page - 1)}
+                             disabled={page === 1}
+                             className={`p-2 border rounded-lg transition-all duration-200 ${
+                               page === 1
+                                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-300'
+                                 : 'bg-white border-gray-300 text-gray-600 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-600'
+                             }`}
+                             aria-label="Previous page"
+                           >
+                             <FiChevronLeft className="text-lg" />
+                           </button>
+       
+                           {/* Page numbers */}
+                           <div className="flex items-center gap-1 mx-2">
+                             {getPageNumbers().map((pageNum) => (
+                               <button
+                                 key={pageNum}
+                                 onClick={() => setPage(pageNum)}
+                                 className={`min-w-[2.5rem] px-3 py-2 border text-sm font-medium rounded-lg transition-all duration-200 ${
+                                   page === pageNum
+                                     ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm'
+                                     : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400'
+                                 }`}
+                                 aria-label={`Page ${pageNum}`}
+                                 aria-current={page === pageNum ? 'page' : undefined}
+                               >
+                                 {pageNum}
+                               </button>
+                             ))}
+                           </div>
+       
+                           <button
+                             onClick={() => setPage(page + 1)}
+                             disabled={page >= totalPages}
+                             className={`p-2 border rounded-lg transition-all duration-200 ${
+                               page >= totalPages
+                                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-300'
+                                 : 'bg-white border-gray-300 text-gray-600 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-600'
+                             }`}
+                             aria-label="Next page"
+                           >
+                             <FiChevronRight className="text-lg" />
+                           </button>
+       
+                           <button
+                             onClick={() => setPage(totalPages)}
+                             disabled={page >= totalPages}
+                             className={`p-2 border rounded-lg transition-all duration-200 ${
+                               page >= totalPages
+                                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-300'
+                                 : 'bg-white border-gray-300 text-gray-600 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-600'
+                             }`}
+                             aria-label="Last page"
+                           >
+                             <FiChevronsRight className="text-lg" />
+                           </button>
+                         </div>
+       
+                         {/* Page size selector */}
+                         <div className="flex items-center gap-2 text-sm text-gray-600">
+                           <span>Rows per page:</span>
+                           <select
+                             className="border border-gray-300 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                             onChange={(e) => {
+                               setLimit(Number(e.target.value));
+                               setPage(1);
+                             }}
+                             value={limit}
+                           >
+                             <option value="10">10</option>
+                             <option value="20">20</option>
+                             <option value="50">50</option>
+                             <option value="100">100</option>
+                           </select>
+                         </div>
+                       </div>
+                     )}
           </div>
         )}
 

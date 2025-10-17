@@ -105,17 +105,17 @@ const DashboardHome = () => {
     return (
         <main className="flex h-screen bg-gray-100 w-full text-slate-800">
             <Sidebar activePage={activePage} setActivePage={setActivePage} />
-            <section className="mb-6 overflow-y-auto w-full min-h-screen p-5">
+            <section className="mb-6 overflow-y-auto w-full min-h-screen py-5 px-3 lg:px-5">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
+                    <div className="mt-6 lg:mt-0">
+                        <h1 className="md:text-3xl text-lg font-bold text-gray-900">Dashboard Overview</h1>
                         <p className="text-gray-600 mt-2">Welcome to your admin dashboard</p>
                     </div>
                     <button
                         onClick={handleCreateSummary}
                         disabled={loadingAction}
-                        className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4 md:mt-0 hover:cursor-pointer"
+                        className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4 md:mt-6 lg:mt-0 hover:cursor-pointer"
                     >
                         {loadingAction ? (
                             <FiRefreshCw className="animate-spin" />

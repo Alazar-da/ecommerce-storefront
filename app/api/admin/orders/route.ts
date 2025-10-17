@@ -5,8 +5,6 @@ import Order from "@/models/Order";
 
 export async function GET(req: Request) {
   try {
-    /*     requireAdmin(req); */
-
     await connectDB();
     const url = new URL(req.url);
     const q = url.searchParams.get("q") || "";

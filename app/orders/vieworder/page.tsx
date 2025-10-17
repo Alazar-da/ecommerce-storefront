@@ -7,7 +7,6 @@ import Link from "next/link";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import CheckoutPage from "../../components/CheckoutPage";
-import convertToSubcurrency from "@/utils/convertToSubcurrency";
 import { Order } from "@/types/Order";
 import { formatPrice } from "@/utils/formatPrice";
 import { shortDate } from "@/utils/date";
@@ -45,7 +44,7 @@ function OrderDetailContent() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              amount: convertToSubcurrency(data.totalAmount),
+              amount: Math.round(data.totalAmount * 100),
               orderId: data._id,
             }),
           });

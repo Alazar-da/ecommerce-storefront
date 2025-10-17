@@ -11,7 +11,7 @@ function Setting() {
     if (!user) {
         return (
             <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-slate-800">
-                <h1 className="text-2xl font-bold">You must be logged in to view this page.</h1>
+                <h1 className="text-2xl font-bold">You must be logged in to view this page.</h1>  
             </main>
         );
     }

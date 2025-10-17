@@ -47,12 +47,12 @@ const Sidebar = ({ activePage, setActivePage }: {
       )}
     {/* Mobile toggle button */}
     <button
-      className="fixed top-4 right-4 z-40 p-2 rounded-md bg-gray-900 text-white lg:hidden flex"
+      className="fixed top-0 left-0 z-40 p-1 font-bold bg-slate-50 w-full border-b border-slate-100 shadow-md text-slate-900 lg:hidden flex"
       onClick={() => setSidebarOpen(true)}
       aria-label="Open sidebar"
       style={{ display: sidebarOpen ? 'none' : '' }}
     >
-      <FiMenu className="text-2xl" />
+      <FiMenu className="text-3xl" />
     </button>
       {/* Sidebar */}
       <section className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-900 h-screen transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
