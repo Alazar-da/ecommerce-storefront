@@ -10,22 +10,22 @@ Includes both **Customer** and **Admin** interfaces with analytics powered by **
 ## 🖼️ Screenshots & Demo
 
 ### 🏠 Home Page
-![Home Page](https://github.com/Alazar-da/ecommerce-storefront/assets/homepage.png)
+![Home Page](https://github.com/Alazar-da/ecommerce-storefront/blob/main/assets/homepage.png)
 
 ### 🛍️ Product Details
-![Product Details](https://github.com/Alazar-da/ecommerce-storefront/assets/product-details.png)
+![Product Details](https://github.com/Alazar-da/ecommerce-storefront/blob/main/assets/product-details.png)
 
 ### 🛒 Shopping Cart
-![Shopping Cart](https://github.com/Alazar-da/ecommerce-storefront/assets/cart.png)
+![Shopping Cart](https://github.com/Alazar-da/ecommerce-storefront/blob/main/assets/cart.png)
 
 ### 💳 Stripe Checkout
-![Stripe Checkout](https://github.com/Alazar-da/ecommerce-storefront/assets/stripe-checkout.png)
+![Stripe Checkout](https://github.com/Alazar-da/ecommerce-storefront/blob/main/assets/stripe-checkout.png)
 
 ### 📊 Admin Dashboard
-![Admin Dashboard](https://github.com/Alazar-da/ecommerce-storefront/assets/admin-dashboard.png)
+![Admin Dashboard](https://github.com/Alazar-da/ecommerce-storefront/blob/main/assets/admin-dashboard.png)
 
 ### 🧰 Product Management
-![Product Management](https://github.com/Alazar-da/ecommerce-storefront/assets/admin-products.png)
+![Product Management](https://github.com/Alazar-da/ecommerce-storefront/blob/main/assets/admin-products.png)
 
 ---
 
