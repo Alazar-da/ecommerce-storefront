@@ -124,8 +124,11 @@ Use the following test card for payments:
 ecommerce-storefront/
 ├── app/                    # Next.js App Router
 │   ├── admin/             # Admin dashboard pages
+│   │   └── components/    # Reusable Admin components
 │   ├── api/               # API routes
 │   └── components/        # Reusable components
+├── DB/                    # Database configuration
+├── models/                # Data models
 ├── store/                 # Zustand state management
 ├── types/                 # TypeScript type definitions
 ├── utils/                 # Utility functions
