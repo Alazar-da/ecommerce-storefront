@@ -99,10 +99,23 @@ Visit [http://localhost:3000](http://localhost:3000) to view the application.
 Create a `.env` file with the following variables:
 
 ```env
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key
-STRIPE_SECRET_KEY=sk_test_your_secret_key
-MONGODB_URI=your_mongodb_connection_string
-NEXTAUTH_SECRET=your_nextauth_secret
+# 🗄️ Database
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-name>.mongodb.net/<database-name>
+
+# ☁️ Cloudinary
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=<your_cloudinary_cloud_name>
+NEXT_PUBLIC_CLOUDINARY_API_KEY=<your_cloudinary_api_key>
+CLOUDINARY_API_SECRET=<your_cloudinary_api_secret>
+
+# 🔑 NextAuth
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=<your_nextauth_secret>
+
+# 💳 Stripe
+STRIPE_SECRET_KEY=sk_test_<your_stripe_secret_key>
+STRIPE_WEBHOOK_SECRET=whsec_<your_webhook_secret>
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_<your_stripe_publishable_key>
+
 ```
 
 ---
@@ -153,6 +166,8 @@ Full-Stack Developer showcasing modern web development technologies and best pra
 ## 📄 License
 
 MIT License © 2025 Alazar
+Permission is hereby granted, free of charge, to any person obtaining a copy...
+
 
 ---
 
@@ -160,6 +175,7 @@ MIT License © 2025 Alazar
 
 - **GitHub Repository:** [https://github.com/Alazar-da/ecommerce-storefront](https://github.com/Alazar-da/ecommerce-storefront)
 - **Live Demo:** [https://ecommerce-storefront-drab.vercel.app/](https://ecommerce-storefront-drab.vercel.app/)
+- **Live Demo:** [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](www.linkedin.com/in/alazar-da/)
 
 ---
 
