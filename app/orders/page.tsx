@@ -5,10 +5,12 @@ import { toast } from "react-toastify";
 import { formatPrice } from "@/utils/formatPrice";
 import { Order } from "@/types/Order";
 import { shortDate } from "@/utils/date";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+     const { user }: { user: any } = useAuthStore();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -27,6 +29,20 @@ export default function OrdersPage() {
   }, []);
 
   console.log(orders);
+
+    if (!user)
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-6">
+          <h1 className="text-2xl font-bold text-gray-800 mb-3">Please Log In</h1>
+          <p className="text-gray-600 mb-6">You need to be logged in to view your orders.</p>
+          <Link
+            href="/login"
+            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+          >
+            Log In
+          </Link>
+        </div>
+      );
 
   return (
   <section className="min-h-screen bg-gray-50 py-8 text-slate-800">

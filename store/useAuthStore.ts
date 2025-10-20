@@ -1,6 +1,7 @@
+// store/useAuthStore.ts
 import { create } from "zustand";
 
-interface User {
+export interface User {
   id: string;
   email: string;
   role?: string;
@@ -9,12 +10,16 @@ interface User {
 
 interface AuthState {
   user: User | null;
+  initialized: boolean;
   setUser: (user: User | null) => void;
+  setInitialized: (v: boolean) => void;
   logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
+  initialized: false,
   setUser: (user) => set({ user }),
-  logout: () => set({ user: null }), // ✅ clear user
+  setInitialized: (v) => set({ initialized: v }),
+  logout: () => set({ user: null }),
 }));

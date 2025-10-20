@@ -1,3 +1,4 @@
+// components/AppInitializer.tsx
 "use client";
 
 import { useEffect } from "react";
@@ -5,17 +6,32 @@ import { fetchSession } from "@/utils/fetchSession";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function AppInitializer() {
-  const setUser = useAuthStore((state) => state.setUser);
+  const setUser = useAuthStore((s) => s.setUser);
+  const setInitialized = useAuthStore((s) => s.setInitialized);
 
   useEffect(() => {
+    let mounted = true;
+
     const loadUser = async () => {
-      const sessionUser = await fetchSession();
-      console.log("Fetched session user:", sessionUser);
-      setUser(sessionUser); // ✅ sets user if token exists
+      try {
+        const sessionUser = await fetchSession();
+        if (!mounted) return;
+        setUser(sessionUser);
+      } catch (err) {
+        console.error("fetchSession error:", err);
+        setUser(null);
+      } finally {
+        if (!mounted) return;
+        setInitialized(true);
+      }
     };
 
     loadUser();
-  }, [setUser]);
 
-  return null; // nothing renders — it just initializes state
+    return () => {
+      mounted = false;
+    };
+  }, [setUser, setInitialized]);
+
+  return null;
 }

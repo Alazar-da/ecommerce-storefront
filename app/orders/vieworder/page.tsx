@@ -10,6 +10,7 @@ import CheckoutPage from "../../components/CheckoutPage";
 import { Order } from "@/types/Order";
 import { formatPrice } from "@/utils/formatPrice";
 import { shortDate } from "@/utils/date";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -20,6 +21,7 @@ function OrderDetailContent() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [clientSecret, setClientSecret] = useState("");
+  const { user }: { user: any } = useAuthStore();
 
   // ✅ Validate Stripe Key
   useEffect(() => {
@@ -63,6 +65,20 @@ function OrderDetailContent() {
 
     fetchOrder();
   }, [id]);
+
+   if (!user)
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-6">
+          <h1 className="text-2xl font-bold text-gray-800 mb-3">Please Log In</h1>
+          <p className="text-gray-600 mb-6">You need to be logged in to view order details.</p>
+          <Link
+            href="/login"
+            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+          >
+            Log In
+          </Link>
+        </div>
+      );
 
   if (loading) {
     return (
