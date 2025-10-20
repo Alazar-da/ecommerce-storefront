@@ -175,9 +175,11 @@ Permission is hereby granted, free of charge, to any person obtaining a copy...
 
 - **GitHub Repository:** [https://github.com/Alazar-da/ecommerce-storefront](https://github.com/Alazar-da/ecommerce-storefront)
 - **Live Demo:** [https://ecommerce-storefront-drab.vercel.app/](https://ecommerce-storefront-drab.vercel.app/)
-
-- [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](www.linkedin.com/in/alazar-da/)
-
+  
 ---
 
+## 🤝 Connect with Me
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Alazar%20Da-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/alazar-da/)
+
+---
 *Note: This is a demonstration project using Stripe test mode. No real transactions are processed.*
