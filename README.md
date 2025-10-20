@@ -1,4 +1,3 @@
-````markdown
 # 🛍️ E-Commerce Storefront — Next.js + TypeScript + Tailwind + Stripe
 
 An elegant and fully functional **E-Commerce Storefront** built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, **Zustand**, and **Stripe Checkout**.  
@@ -10,43 +9,35 @@ Includes both **Customer** and **Admin** interfaces with analytics powered by **
 
 ## 🖼️ Screenshots & Demo
 
-<!-- 🔹 Main Hero / Home Page -->
-![Home Page Screenshot](https://github.com/Alazar-da/ecommerce-storefront/assets/homepage.png)
-> 🏠 *Recommended:* full-width homepage showing product grid.  
-> 📏 Size: ~1200×700 px
+### 🏠 Home Page
+![Home Page](https://github.com/Alazar-da/ecommerce-storefront/assets/homepage.png)
 
-<!-- 🔹 Product Detail Page -->
-![Product Detail Screenshot](https://github.com/Alazar-da/ecommerce-storefront/assets/product-details.png)
-> 🛍️ *Recommended:* show product image + add-to-cart button.  
-> 📏 Size: ~1200×700 px
+### 🛍️ Product Details
+![Product Details](https://github.com/Alazar-da/ecommerce-storefront/assets/product-details.png)
 
-<!-- 🔹 Cart Page -->
-![Cart Screenshot](https://github.com/Alazar-da/ecommerce-storefront/assets/cart.png)
-> 🛒 *Recommended:* show cart items + checkout button.
+### 🛒 Shopping Cart
+![Shopping Cart](https://github.com/Alazar-da/ecommerce-storefront/assets/cart.png)
 
-<!-- 🔹 Stripe Checkout Page -->
-![Stripe Checkout Screenshot](https://github.com/Alazar-da/ecommerce-storefront/assets/stripe-checkout.png)
-> 💳 *Recommended:* screenshot of Stripe checkout page in test mode.
+### 💳 Stripe Checkout
+![Stripe Checkout](https://github.com/Alazar-da/ecommerce-storefront/assets/stripe-checkout.png)
 
-<!-- 🔹 Admin Dashboard -->
-![Admin Dashboard Screenshot](https://github.com/Alazar-da/ecommerce-storefront/assets/admin-dashboard.png)
-> 📊 *Recommended:* show Chart.js analytics view and sidebar layout.
+### 📊 Admin Dashboard
+![Admin Dashboard](https://github.com/Alazar-da/ecommerce-storefront/assets/admin-dashboard.png)
 
-<!-- 🔹 Admin Product Management -->
-![Admin Product Management Screenshot](https://github.com/Alazar-da/ecommerce-storefront/assets/admin-products.png)
-> 🧰 *Recommended:* CRUD product management view (table or form).
+### 🧰 Product Management
+![Product Management](https://github.com/Alazar-da/ecommerce-storefront/assets/admin-products.png)
 
 ---
 
 ## 🔐 Demo Credentials
 
-> **Customer**
-- Email: `user@gmail.com`
-- Password: `User@123`
+### 👤 Customer Account
+- **Email:** `user@gmail.com`
+- **Password:** `User@123`
 
-> **Admin**
-- Email: `Admin@gmail.com`
-- Password: `Admin@123`
+### 👨‍💼 Admin Account
+- **Email:** `Admin@gmail.com`
+- **Password:** `Admin@123`
 
 ---
 
@@ -65,106 +56,108 @@ Includes both **Customer** and **Admin** interfaces with analytics powered by **
 
 ## ✨ Features
 
-### 🧾 Customer Side
-- 🏠 Product listing page with filters
+### 🛍️ Customer Side
+- 🏠 Product listing page with filters and search
 - 🛍️ Product detail page with image gallery
-- 🛒 Add/remove items from cart
-- 💳 Checkout with Stripe (test mode)
-- 👤 User session managed via Zustand
+- 🛒 Add/remove items from shopping cart
+- 💳 Secure checkout with Stripe integration
+- 👤 User session management
 
 ### 🛠️ Admin Dashboard
-- 📊 Analytics dashboard (Chart.js)
-- 🧰 Product CRUD management
-- 🔒 Admin authentication & protected routes
+- 📊 Analytics dashboard with Chart.js visualizations
+- 🧰 Complete product CRUD operations
+- 🔒 Protected admin routes and authentication
+- 📈 Sales and revenue tracking
 
 ---
 
-## ⚙️ Local Setup
+## ⚙️ Local Development
 
 ```bash
+# Clone the repository
 git clone https://github.com/Alazar-da/ecommerce-storefront.git
-cd ecommerce-storefront
-npm install
-cp .env.example .env
-npm run dev
-````
 
-Open [http://localhost:3000](http://localhost:3000)
+# Navigate to project directory
+cd ecommerce-storefront
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+
+# Start development server
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to view the application.
 
 ---
 
-## 🧩 Environment Variables
+## 🔧 Environment Configuration
+
+Create a `.env` file with the following variables:
 
 ```env
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
-STRIPE_SECRET_KEY=sk_test_xxx
-MONGODB_URI=mongodb+srv://user:pw@cluster.mongodb.net/db
-NEXTAUTH_SECRET=some_secret
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key
+STRIPE_SECRET_KEY=sk_test_your_secret_key
+MONGODB_URI=your_mongodb_connection_string
+NEXTAUTH_SECRET=your_nextauth_secret
 ```
 
 ---
 
-## 🧾 Stripe (Test Mode)
+## 💳 Stripe Test Mode
 
-* Card: `4242 4242 4242 4242`
-* Exp: any future date
-* CVC: any 3 digits
+Use the following test card for payments:
 
----
-
-## 🧭 Project Structure
-
-```
-/app
-  /admin
-  /api
-  /components
-/store
-/types
-/utils
-```
+- **Card Number:** `4242 4242 4242 4242`
+- **Expiry Date:** Any future date
+- **CVC:** Any 3 digits
+- **ZIP:** Any 5 digits
 
 ---
 
-## 📊 Admin Analytics
+## 📁 Project Structure
 
-![Chart.js Analytics Screenshot](https://github.com/Alazar-da/ecommerce-storefront/assets/analytics.png)
-
-> 📈 *Optional:* Include a Chart.js dashboard screenshot showing sales/revenue chart.
+```
+ecommerce-storefront/
+├── app/                    # Next.js App Router
+│   ├── admin/             # Admin dashboard pages
+│   ├── api/               # API routes
+│   └── components/        # Reusable components
+├── store/                 # Zustand state management
+├── types/                 # TypeScript type definitions
+├── utils/                 # Utility functions
+└── public/               # Static assets
+```
 
 ---
 
 ## 🚀 Deployment
 
-Deployed on **Vercel** — fast, serverless, and production-ready.
+This project is deployed on **Vercel** for optimal performance and serverless functionality.
 
 ---
 
-## 🧑‍💻 Author
+## 👨‍💻 Author
 
-Built by **Alazar** — showcasing full-stack skills with modern web technologies.
-💬 Connect on [LinkedIn](https://linkedin.com/in/your-link) or [Portfolio](https://your-portfolio-link.com)
-
----
-
-## 🪪 License
-
-MIT © 2025 Alazar
-
-```
+**Alazar**  
+Full-Stack Developer showcasing modern web development technologies and best practices.
 
 ---
 
-### 📸 TL;DR — Suggested Image List
+## 📄 License
 
-| Section | File Name | Description |
-|----------|------------|--------------|
-| Home Page | `homepage.png` | Hero + product list |
-| Product Details | `product-details.png` | Single product view |
-| Cart | `cart.png` | Cart items + totals |
-| Checkout | `stripe-checkout.png` | Stripe checkout screen |
-| Admin Dashboard | `admin-dashboard.png` | Charts & stats |
-| Product Management | `admin-products.png` | Product CRUD table or form |
-| Analytics (optional) | `analytics.png` | Chart.js demo |
+MIT License © 2025 Alazar
 
 ---
+
+## 🔗 Links
+
+- **GitHub Repository:** [https://github.com/Alazar-da/ecommerce-storefront](https://github.com/Alazar-da/ecommerce-storefront)
+- **Live Demo:** [https://ecommerce-storefront-drab.vercel.app/](https://ecommerce-storefront-drab.vercel.app/)
+
+---
+
+*Note: This is a demonstration project using Stripe test mode. No real transactions are processed.*
