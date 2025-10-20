@@ -175,7 +175,8 @@ Permission is hereby granted, free of charge, to any person obtaining a copy...
 
 - **GitHub Repository:** [https://github.com/Alazar-da/ecommerce-storefront](https://github.com/Alazar-da/ecommerce-storefront)
 - **Live Demo:** [https://ecommerce-storefront-drab.vercel.app/](https://ecommerce-storefront-drab.vercel.app/)
-- **Live Demo:** [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](www.linkedin.com/in/alazar-da/)
+
+- [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](www.linkedin.com/in/alazar-da/)
 
 ---
 
